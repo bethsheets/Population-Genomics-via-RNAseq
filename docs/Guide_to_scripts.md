@@ -65,7 +65,7 @@
 - to move a file from cluster to your computer
 	`rsync user@sherlock.stanford.edu:/share/PI/spalumbi/... /Users/username/Desktop/...`
 	- use `rsync -a` to transfer an entire directory
--  can use the output length stats for your FLASH input###Merge Paired End reads (FLASH) - 	[webpage](https://ccb.jhu.edu/software/FLASH/)- 	get lengths of your trimmed seqs above and use in FLASH script- 	scripts: batch-flash.sh- 	use FLASH %assembled, pick best for assembly###Pick what samples to assemble in Trinity  - 	pick sample(s) relevant to your biological question- 	restrict sample # to computation capacity- 	can use FLASH results for quality filtering- 	Example assembly for population analysis: 
+-  can use the output length stats for your FLASH input###Merge Paired End reads (FLASH) - 	[webpage](https://ccb.jhu.edu/software/FLASH/)- 	get lengths of your trimmed seqs above and use in FLASH script- 	scripts: batch-flash.sh- 	use FLASH %assembled, pick best for assembly###Pick what samples to assemble into a transcriptome  - 	pick samples relevant to your biological question- 	restrict sample # for computational capacity- 	can use FLASH results for quality filtering- 	Example assembly for population analysis: 
 	-  16 Balanus samples from Hopkins
 	-  we created 3 separate Trinity assemblies of 3 individuals with best FLASH merging score
 		- the 3 assemblies ranged from 94,000 - 250,000 contigs
