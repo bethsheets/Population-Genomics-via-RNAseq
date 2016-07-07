@@ -1,13 +1,13 @@
 #Transcriptome assembly & analysis in the Palumbi Lab*by Beth Sheets, last updated 6/2016##GENERAL INFORMATION###* Scripts are formatted for Stanford internal use. We use SLURM to send jobs to Stanford's Sherlock cluster.
 
-###How to create a Sherlock account - to get access and support, SRP e-mails research-computing-support@stanford.edu- download [Kerberos](https://uit.stanford.edu/service/kerberos)
+###How to create a Sherlock account - to get access and support, e-mail research-computing-support[at]stanford.edu- download [Kerberos](https://uit.stanford.edu/service/kerberos)
 - [Sherlock Wiki] (http://sherlock.stanford.edu/mediawiki/index.php/Main_Page)
 - create project directory in `$PI_SCRATCH/` (1TB space available)
 	- more space and accessible to other users in the lab 
 - your personal `$HOME` is 15GB
 - [more info on Sherlock storage](http://sherlock.stanford.edu/mediawiki/index.php/DataStorage)###Downloading & storing data - install [fdt.jar](http://monalisa.cern.ch/FDT/) in your chosen Sherlock directory- use command line from Gnomex to download to Sherlock- backup raw files on external harddrive in lab###Sherlock basics 
 
-- `kinit user@stanford.eu` & type in pw
+- `kinit user@stanford.edu` & type in pw
 - `ssh user@sherlock.stanford.edu` to access cluster
 - `$HOME` your personal directory	 - limited to 15GB storage
 	 - not accessible to other users-	`$PI_HOME/scripts` & `$PI_HOME/programs` contains all common use lab scripts & programs	 - add your contributions to these two directories
