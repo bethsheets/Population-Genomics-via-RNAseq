@@ -174,6 +174,7 @@
 	$ rm -metrics.txt 
 
 ```
+
 ###script options:
 - batch-bowtie-fq-flash.sh 
 	- if you used flash on your PE reads
