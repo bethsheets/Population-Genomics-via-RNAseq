@@ -104,7 +104,7 @@
 	-   `grep ">" <assembly_file.fa> | perl histogram.pl | head -n`###8)Annotate (BLAST) - 	[Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
 -  [blastx commands, table C4](http://www.ncbi.nlm.nih.gov/books/NBK279675/)
 
-###How to download and create a blast database on your cluster
+####How to download and create a blast database on your cluster
 - download your database
 	- ex: uniprot, blast-nr, genome of species of interest- to open .tar files downloaded from genbank: 
 	`for i in *.tar ; do tar -xvf $i ; done &`
@@ -161,7 +161,7 @@
 -  step 2:
 	- create a file of good contigs	- `bash grep-good-contigs.sh all_parsed.txt assembly.fa`- 	step 3:	- pull only good contigs from your assembly file	- on cluster: 
 	- `sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`	- 	check your parsed outputs to see if there are taxa in there you don’t want and change/add them to the script- 	to check how filtering went:	- `grep -c “Contig” goodcontigs.txt`
-	- `grep -c "TRINITY" goodcontigs.txt`	- `grep -c “>” filteredassembly.fa`###Filtering other ideas - 	multiple blasts against different taxa (i.e. coral vs symbiont)- 	High stringency blast- 	Contig length cutoff- 	phylogenetically filtering, i.e. microbes using MEGAN, KRAKEN##TRANSCRIPTOME ANALYSIS###Map reads to assembly (Bowtie2) - 	[Bowtie2 ddownload](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
+	- `grep -c "TRINITY" goodcontigs.txt`	- `grep -c “>” filteredassembly.fa`####Filtering other ideas - 	multiple blasts against different taxa (i.e. coral vs symbiont)- 	High stringency blast- 	Contig length cutoff- 	phylogenetically filtering, i.e. microbes using MEGAN, KRAKEN##TRANSCRIPTOME ANALYSIS###Map reads to assembly (Bowtie2) - 	[Bowtie2 ddownload](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
 ```
 
@@ -175,7 +175,7 @@
 
 ```
 
-###script options:
+####script options:
 - batch-bowtie-fq-flash.sh 
 	- if you used flash on your PE reads
 - batch-bowtie2-fq-paired.sh
