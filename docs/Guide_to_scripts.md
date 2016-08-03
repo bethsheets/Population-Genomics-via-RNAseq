@@ -164,15 +164,14 @@
 	- `grep -c "TRINITY" goodcontigs.txt`	- `grep -c “>” filteredassembly.fa`####Filtering other ideas - 	multiple blasts against different taxa (i.e. coral vs symbiont)- 	High stringency blast- 	Contig length cutoff- 	phylogenetically filtering, i.e. microbes using MEGAN, KRAKEN##TRANSCRIPTOME ANALYSIS###Map reads to assembly (Bowtie2) - 	[Bowtie2 ddownload](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
 ```
-
-	# make a bowtie index from your final assembly   $ bowtie2-build <input.fa> <name_bt2index> 	# check that it outputs 6 files .bt2
-   	# If you used flash to merge PE reads, use:
-   	$ bash batch-bowtie2-fq-###.sh b2index 1 *notCombined_1.fastq
-	#check TEMPBATCH.sbatch after submitting to see if it started correctly 
-	$ cat TEMPBATCH.sbatch	# after it completes, check for errors	$ cat slurm*
-	# if rerunning, make sure you remove files that don't allow writing over, i.e.
-	$ rm -metrics.txt 
-
+	# make a bowtie index from your final assembly   $ bowtie2-build <input.fa> <name_bt2index> 
+   # check that it outputs 6 files .bt2
+   # If you used flash to merge PE reads, use:
+   $ bash batch-bowtie2-fq-###.sh b2index 1 *notCombined_1.fastq
+   #check TEMPBATCH.sbatch after submitting to see if it started correctly 
+   $ cat TEMPBATCH.sbatch   # after it completes, check for errors   $ cat slurm*
+   # if rerunning, make sure you remove files that don't allow writing over, i.e.
+   $ rm -metrics.txt 
 ```
 
 ####script options:
