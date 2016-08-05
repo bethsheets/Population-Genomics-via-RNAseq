@@ -115,7 +115,7 @@
 	$ sdev
 	$ head <assembly.fa> > <test_assembly.fa>	$ srun --mem=12000 —pty bash	$ blastx -db /share/PI/spalumbi/genbank_nr_Feb_2016/nr -query <test_assembly.fa> -out <test.out> -outfmt 11 &  
 
-
+	```
 
 ###8a)Annotate with Uniprot database- 	Uniprot is a more curated database and is recommended over NCBI-nr
 #### How to download & create the uniprot database for the first time:- 	[download Swiss-Prot & Trembl databases](http://www.uniprot.org/downloads)
@@ -128,12 +128,12 @@
 - 	after running, check if you get an error during your blasts
 	- `cat slurm*` 
 	- most often, your blast may time out- if you get an error:
- 	
+ 	```
  		$ grep -B 1 error slurm*.out
   		# for any file with error, take line before (the tempfile)		$ cat <TEMPwerror.fa> <TEMPwerror.fa> > <didnotfinish.fa>
 		$ this concatenates all TEMP files that contain an error into a new file
 		# you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file		$ bash batch-blast-uniprot.sh <didnotfinish.fa> #rerun script
-		
+	```		
 ###8b)Annotate with NCBI-nr database#### How to download & create the nr database for the first time
 - Make sure local database on sherlock is up to date- to open .tar files downloaded from genbank: 
 	`for i in *.tar ; do tar -xvf $i ; done &`
@@ -142,11 +142,13 @@
 	- splits your assembly into TEMP files for parallel processing- 	after running, check if you get an error during your blasts
 	- `cat slurm*` 
 	- most often, your blast may time out- if you get an error:
- 	
- 		$ grep -B 1 error slurm*.out
+ 	```
+ 	 	$ grep -B 1 error slurm*.out
   		# for any file with error, take line before (the tempfile)		$ cat <TEMPwerror.fa> <TEMPwerror.fa> > <didnotfinish.fa>
 		$ this concatenates all TEMP files that contain an error into a new file
-		# you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file		$ bash batch-blast-uniprot.sh <didnotfinish.fa> #rerun script	
+		# you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file		$ bash batch-blast-uniprot.sh <didnotfinish.fa> #rerun script
+	```
+		
 ###8c)Reciprocal BLAST - 	`makeblastdb -in file.fasta -dbtype nucl -out file.fasta –parse_seqids`- 	can do this to check overlap between your multiple Trinity alignments 
 	-  does heterozygosity cause issues in your alignments
 
@@ -210,9 +212,7 @@ pc.out<-prcomp(snps)
 summary(pc.out)
 
 #plot PCA1 v PCA2
-plot(pc.out$x[,1],pc.out$x[,2])
-
-	```
+plot(pc.out$x[,1],pc.out$x[,2])	```
 ###Add Meta data to Matrix - 	make a meta data file with info about individuals (location, date, etc.)- 	make sure your meta file is ordered the same as your vcfs! (i.e. ls your samples in the terminal to see their order)
 - script TBD
 ###Test for loci under selection (BayeScan)- [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)- 	identifies putative loci under selection##GENE EXPRESSION ANALYSIS 
