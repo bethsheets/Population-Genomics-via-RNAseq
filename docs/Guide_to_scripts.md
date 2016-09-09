@@ -180,9 +180,9 @@
 - batch-bowtie-fq-flash.sh 
 	- if you used flash on your PE reads
 - batch-bowtie2-fq-paired.sh
-- batch-bowtie2-fq-PE125bp-strict.sh [recommended]
+- batch-bowtie2-fq-paired-strict.sh
 	- --score-min x value calculated for 125 bp seq length (no flash step) with min 4 mismatches every 125 bp
-- batch-bowtie2-fq-single50-strict.sh [recommended]
+- batch-bowtie2-fq-single50-strict.sh
 	- --score-min x value calculated for 50bp (no flash step) with 2 min mismatches every 50 bp
 
 	
@@ -210,16 +210,15 @@ snps<-as.matrix(snps)
 #PCA of SNPs
 pc.out<-prcomp(snps)
 summary(pc.out)
-
-#plot PCA1 v PCA2
-plot(pc.out$x[,1],pc.out$x[,2])	```
+plot(pc.out$x[,1],pc.out$x[,2])	#PC1 v PC2
+```
 ###Add Meta data to Matrix - 	make a meta data file with info about individuals (location, date, etc.)- 	make sure your meta file is ordered the same as your vcfs! (i.e. ls your samples in the terminal to see their order)
 - script TBD
 ###Test for loci under selection (BayeScan)- [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)- 	identifies putative loci under selection##GENE EXPRESSION ANALYSIS 
 
 ###Expression counts
 - `bash get-bam-counts.sh *.bam`
-- ###WGCNA 
+###WGCNA 
 - in program R
 - [website](https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/)
 - script TBD###Gene expression (DESeq2)
