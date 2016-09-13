@@ -1,4 +1,4 @@
-#Transcriptome assembly & analysis in the Palumbi Lab*by Beth Sheets, last updated 6/2016##GENERAL INFORMATION###* Scripts are formatted for Stanford internal use. We use SLURM to send jobs to Stanford's Sherlock cluster.
+#Transcriptome assembly & analysis in the Palumbi Lab*by Beth Sheets, last updated 9/2016##GENERAL INFORMATION###* Scripts are formatted for Stanford internal use. We use SLURM to send jobs to Stanford's Sherlock cluster.
 
 ###How to create a Sherlock account - to get access and support, e-mail research-computing-support[at]stanford.edu- download [Kerberos](https://uit.stanford.edu/service/kerberos)
 - [Sherlock Wiki] (http://sherlock.stanford.edu/mediawiki/index.php/Main_Page)
@@ -64,10 +64,10 @@
 - when making scripts that split up data into TEMP files for parallel processing, add a line that states your input file in the slurm output
 	- `echo $1` if $1 is your input file- to count lines in a file	- `wc - l <filename>`
 - to count contigs in a file
-	- `grep -c “>” <filename>`##DE NOVO TRANSCRIPTOME ASSEMBLY###1) Trim & Clip (Trimmomatic) - this step should be done for all projects
-	- this program removes adapters, low quality seqs, etc.- [webpage](http://www.usadellab.org/cms/?page=trimmomatic)
+	- `grep -c “>” <filename>`##DE NOVO TRANSCRIPTOME ASSEMBLY###1) Trim & Clip (Trimmomatic) 
+- this program removes adapters, low quality seqs, etc.- [webpage](http://www.usadellab.org/cms/?page=trimmomatic)
 -  for paired end reads:	- `bash batch-trimmomatic-pe.sh *_1.txt`
-	- outputs 4 files: 1_paired.fq, 2_paired.fq, 1_unpaired.fq, 2_unpaired.fq
+	- outputs 4 files: 1\_paired.fq, 2\_paired.fq, 1\_unpaired.fq, 2\_unpaired.fq
 -  for single end reads:
 	`batch-trimmomatic-se.sh`###2) Quality check (FastQC) 
 - this step is useful for picking samples to use in your Trinity assembly, for example: if you have >10 samples you may want to pick those with the highest quality sequencing.
@@ -77,28 +77,24 @@
 	`rsync user@sherlock.stanford.edu:/share/PI/spalumbi/... /Users/username/Desktop/...`
 	- use `rsync -a` to transfer an entire directory
 -  can use the output length stats for your FLASH input###3) Merge Paired End reads (FLASH) 
-- 	This step is necessary for PE data to merge your two reads (_1 and _2) that you will use in transcriptome assembly, but is not necessary for SE data 
--  use your quality outputs from - 	[webpage](https://ccb.jhu.edu/software/FLASH/)- 	get lengths of your trimmed seqs above and use in FLASH script- 	scripts: batch-flash.sh- 	use FLASH %assembled, pick best for assembly###4) Pick what samples to assemble into a transcriptome  - 	pick samples relevant to your biological question- 	restrict sample # for computational capacity- 	can use FLASH results for quality filtering- 	Example assembly for population analysis: 
+- 	This step is necessary for PE data to merge your two reads (\_1 and \_2) that you will use in transcriptome assembly, but is not necessary for SE data 
+-  use your quality outputs from FastQC - 	[webpage](https://ccb.jhu.edu/software/FLASH/)- 	get lengths of your trimmed seqs above and use in FLASH script- 	scripts: batch-flash.sh- 	You can pick samples with the best FLASH %assembled to use for your assembly###4) Pick what samples to assemble into a transcriptome  - 	pick samples relevant to your biological question- 	restrict sample # for computational capacity- 	can use FLASH results for quality filtering- 	Example assembly for population analysis: 
 	-  16 Balanus samples from Hopkins
-	-  we created 3 separate Trinity assemblies of 3 individuals with best FLASH merging score
-		- the 3 assemblies ranged from 94,000 - 250,000 contigs
+	-  we created 3 separate Trinity assemblies of 3 individuals with best FLASH merging scores
+		- the 3 Trinity assemblies ranged from 94,000 - 250,000 contigs
 		- after taking the longest isoform of each assembly: 75,000 - 180,000
-	-  meta-assemble the 3 Trinity assemblies with a long read assembler
-		- see CAP3 below
+	-  We then meta-assembled the 3 Trinity assemblies with a long read assembler (CAP3)
 		- we found that meta-assembling allowed us to put more samples/diversity into our assembly without inflating the number of contigs
 		- for comparison
-			- Trinity assembly of 8 individuals: 930,000 contigs > 830,000 longest isoforms
-			- CAP3 meta assembly of 3 Trinity assemblies (each made of 3 individuals): 200,000 contigs+singlets###5a) De novo Assembly (Trinity) - 	[Trinity wiki] (https://github.com/trinityrnaseq/trinityrnaseq/wiki)- 	to see insides of Trinity: 
+			- Trinity assembly of 8 individuals: 930,000 contigs and 830,000 longest isoforms
+			- CAP3 meta assembly of 3 Trinity assemblies (each made of 3 individuals, 9 individuals total): 200,000 contigs+singlets###5a) De novo assembly (Trinity) - 	[Trinity wiki] (https://github.com/trinityrnaseq/trinityrnaseq/wiki)- 	to see insides of Trinity: 
 	-  	`.Trinity --show_full_usage_info`- 	example script: `example_Trinity_mkm.sbatch` 
-	-  you need to update this example for your assembly
-	-  SE v PE:
-	-  if you use flash:
-- [Sherlock policies on computing usage](http://sherlock.stanford.edu/mediawiki/index.php/Current_policies) - 	[Trinity computing requirements](https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-Computing-Requirements)
+	-  you need to update this example for your assembly - 	[Trinity computing requirements](https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-Computing-Requirements)
 	-  1GB RAM for 1M reads	- 	Example: 3 Balanus samples: 11649437 + 11728787 + 11556893
-	-  total pairs of reads = 34,835,117 is 35GB RAM and 35 hours of time###5b)Transcriptome assembly quality assessment - 	[Trinity Quality Assessment](https://github.com/trinityrnaseq/trinityrnaseq/wiki/Transcriptome-Assembly-Quality-Assessment)- 	location in Sherlock: /share/PI/spalumbi/programs/trinityrnaseq-2.1.1/util/TrinityStats.pl Trinity.fasta- 	to get median contig length:
+	-  total pairs of reads = 34,835,117 is 35GB RAM and 35 hours of time###5b)Transcriptome assembly quality assessment - 	to get median contig length:
   ```
   $ samtools faidx Bg_2assembliesof3.fa  $ module load R  $ R  $ index<-read.delim(‘<file.fa.fai>’, header=F)  $ median(index[,2])  $ table(cut(index[,2],30)) #bins into groups of 30  $ table(index[,2]>300) #how many contigs are greater than 30bp
-  ```###6a)Take the longest Isoform from each contig - 	`perl longestisoform_trinity.pl <input.fasta> <output.fasta>`- 	this reduces computational load for CAP3###6b)If meta-assembling Trinity assemblies - 	rename contigs in one file by adding “a” to end of name- 	otherwise CAP3 may get confused if names are repeated- 	cat inputfile inputfile > all_assemblies.fasta###7)Meta-Assembly (CAP3) - 	[paper](http://genome.cshlp.org/content/9/9/868.full)- 	[manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)- 	CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity- 	`sbatch cap3.sh`- 	merge your contigs and singlets files into one assembly file	- `cat file.fasta.cap.contigs file.fasta.cap.singlets > newfile.fasta`
+  ```###6a)Take the longest Isoform from each contig - 	to call program: `perl longestisoform_trinity.pl <input.fasta> <output.fasta>`- 	this reduces computational load for CAP3###6b)If meta-assembling Trinity assemblies - 	rename contigs in one file by adding “a” to end of name- 	otherwise CAP3 may get confused if names are repeated- 	cat inputfile inputfile > all_assemblies.fasta###7)Meta-Assembly (CAP3) - 	[paper](http://genome.cshlp.org/content/9/9/868.full)- 	[manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)- 	CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity- 	to call program: `sbatch cap3.sh`- 	merge your contigs and singlets files into one assembly file	- `cat file.fasta.cap.contigs file.fasta.cap.singlets > newfile.fasta`
 	- contigs are what CAP3 merged, singlets did not merge and still contain the Trinity output name- 	to look at contig #s after CAP3:  
 	-  `grep -c '>' file.fasta`- 	to check for contig name duplicates: 
 	-   `grep ">" <assembly_file.fa> | perl histogram.pl | head -n`###8)Annotate (BLAST) - 	[Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
@@ -118,6 +114,8 @@
 	```
 
 ###8a)Annotate with Uniprot database- 	Uniprot is a more curated database and is recommended over NCBI-nr
+
+
 #### How to download & create the uniprot database for the first time:- 	[download Swiss-Prot & Trembl databases](http://www.uniprot.org/downloads)
 	```
 	# merge two files into one database
@@ -180,10 +178,6 @@
 - batch-bowtie-fq-flash.sh 
 	- if you used flash on your PE reads
 - batch-bowtie2-fq-paired.sh
-- batch-bowtie2-fq-paired-strict.sh
-	- --score-min x value calculated for 125 bp seq length (no flash step) with min 4 mismatches every 125 bp
-- batch-bowtie2-fq-single50-strict.sh
-	- --score-min x value calculated for 50bp (no flash step) with 2 min mismatches every 50 bp
 
 	
 ##SNP CALLING, FILTERING, & ANALYSIS###SNP Calling (Freebayes) - 	step 1: make a contig list for input into freebayes- 	`bash fasta2bed.sh assembly.fa outfile`- step 2:
