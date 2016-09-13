@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#SBATCH --qos=normal
-#SBATCH --time=1:00:00
+#SBATCH -p spalumbi
 #SBATCH --mem=8000
 
 #usage: sbatch batch-deduplicate.sh *.fastq

@@ -1,7 +1,7 @@
 #!/bin/bash 
 #
 #SBATCH --time=10:00:00
-#SBATCH --qos=normal
+#SBATCH -p owners
 #SBATCH --ntasks=1
 #SBATCH --mem=8000
 

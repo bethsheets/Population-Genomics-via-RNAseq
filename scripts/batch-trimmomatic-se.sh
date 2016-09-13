@@ -28,9 +28,9 @@ for i in $FILES; do
     BASE=$(basename $i .fastq)
     
     if [ $COUNTER -eq 0 ]; then
-    echo -e "#!/bin/bash\n#SBATCH --ntasks=1\n" > TEMPBATCH.sbatch; fi
-
-	echo "srun $PI_HOME/programs/Trimmomatic-0.35/trimmomatic-0.35.jar SE -phred33 ${BASE}.fastq ${BASE}_trimmed.fastq ILLUMINACLIP:${ADAPTERS}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:${LENGTH}" >> TEMPBATCH.sbatch
+    echo -e "#!/bin/bash\n#SBATCH -p owners --mem=8000 --ntasks=1\n" > TEMPBATCH.sbatch; fi
+	
+    echo "java -jar $PI_HOME/programs/Trimmomatic-0.35/trimmomatic-0.35.jar SE -phred33 ${BASE}.fastq ${BASE}_trimmed.fastq ILLUMINACLIP:${ADAPTERS}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:${LENGTH}" >> TEMPBATCH.sbatch
 	
 	let COUNTER=COUNTER+1
         

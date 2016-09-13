@@ -1,4 +1,5 @@
 #!/bin/bash
+#SBATCH -p owners
 # usage: mkdir vcfout
 # usage: freebayes-cluster.sh ref.fa vcfout contiglist ncpu "bams"
 
@@ -23,6 +24,6 @@ for i in TEMP-CONTIG-LIST* ; do
     sed -i "s,--output=.*,--output=${i}.out,g" ${i}.sbatch
     sed -i "s,REF=.*,REF=$REF,g" ${i}.sbatch
     sed -i "s,BAMS=.*,BAMS=\"$BAMS\",g" ${i}.sbatch
-    #SBATCH -p owners\nsbatch ${i}.sbatch
+    sbatch -p owners ${i}.sbatch
 done
 
