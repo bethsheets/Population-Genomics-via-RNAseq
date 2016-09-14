@@ -20,7 +20,7 @@
 	 - not accessible to other users-	`$PI_HOME/scripts` & `$PI_HOME/programs` contains all common use lab scripts & programs	 - add your contributions to these two directories
 	 - add a program to Sherlock
 	 - `cd $PI_HOME/programs`
-	 - `wget <linktofiledownload>
+	 - `wget <linktofiledownload>`
 	 - `unzip <file>` or `gzip <file.gz>` - 	modifying your path to include scripts & programs:
 	-  this allows you to access these directories from any directory without having to hardcode the path	 
 	 ```
