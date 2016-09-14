@@ -221,7 +221,7 @@ plot(pc.out$x[,1],pc.out$x[,2])	#PC1 v PC2
 library(DESeq2) counts<-read.delim(‘counts.txt,row.names=1) cds<-DESeqDataSetFromMatrix(counts.txt,meta,~cluster) cds<-DESeq(cds) res<-results(cds) sig<-res[which(res$padj<0.05),] write.table(sig,file=‘DEcontigs.txt’,quote=F,sep=‘\t') 
 ```###Samtools
 - [manual](http://www.htslib.org/doc/samtools.html)- to view reads mapped to contig of interest
-	- `$ samtools tview <sample.bam> <assembly.fa>
+	- `$ samtools tview <sample.bam> <assembly.fa>`
 	- `$ g` #type in contig name of interest
 
 	- create a file of one contig
