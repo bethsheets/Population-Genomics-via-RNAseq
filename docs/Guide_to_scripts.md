@@ -166,18 +166,18 @@
 ```
 	# make a bowtie index from your final assembly   $ bowtie2-build <input.fa> <name_bt2index> 
    # check that it outputs 6 files .bt2
-   # If you used flash to merge PE reads, use:
-   $ bash batch-bowtie2-fq-###.sh b2index 1 *notCombined_1.fastq
+   # Option 1: PE reads
+   $ bash batch-bowtie2-fq-paired.sh b2index 1 *notCombined_1.fastq
    #check TEMPBATCH.sbatch after submitting to see if it started correctly 
    $ cat TEMPBATCH.sbatch   # after it completes, check for errors   $ cat slurm*
    # if rerunning, make sure you remove files that don't allow writing over, i.e.
    $ rm -metrics.txt 
 ```
 
-####script options:
+####other Bowtie2 script options:
 - batch-bowtie-fq-flash.sh 
 	- if you used flash on your PE reads
-- batch-bowtie2-fq-paired.sh
+
 
 	
 ##SNP CALLING, FILTERING, & ANALYSIS###SNP Calling (Freebayes) - 	step 1: make a contig list for input into freebayes- 	`bash fasta2bed.sh assembly.fa outfile`- step 2:
@@ -187,7 +187,9 @@ mkdir vcfout #in same directory as your flash merged samples
 sbatch freebayes-cluster.sh assembly.fa vcfout contiglist ncpu *bam
 
 ```- if not using cluster script, see `freebayes-sequential-intervals.sbatch`###Filter SNPs (vcflib)- 	[vcflib website](https://github.com/vcflib/vcflib#vcflib)- 	[vcflib scripts](https://github.com/vcflib/vcflib/tree/master/scripts)- 	can filter for: read depth, read mapping quality, base quality, minor allele frequency- 	step 1: 
--  `$ fastVCFcombine.sh <outfile> *.vcf`- 	step 2, option 1: filter by genotype (i.e. all individuals must have a quality score of 30 at that SNP)- 	`$ sbatch vcf-filter-nomissing-maf05-allgq30.sh #samples <outfile> *.vcf`- 	step 2, option 2: filter by locus with quality score of 30- `$ sbatch vcf-filter-nomissing-maf05-qual30.sh #samples <outfile> *.vcf`###Create 0,1,2 genotype SNP matrix (vcftools)- 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfil>`###Format SNP Matrix
+-  `$ fastVCFcombine.sh <outfile> *.vcf`- 	step 2, option 1: filter by genotype (i.e. all individuals must have a quality score of 30 at that SNP)- 	`$ sbatch vcf-filter-nomissing-maf05-allgq30.sh #samples <outfile> *.vcf`- 	step 2, option 2: filter by locus with quality score of 30- `$ sbatch vcf-filter-nomissing-maf05-qual30.sh #samples <outfile> *.vcf`
+- step 2, option 3: filter for eSNPs
+- `$ sbatch vcf-filter-nomissing-maf05-eSNPs.sh #samples <outfile> *.vcf`###Create 0,1,2 genotype SNP matrix (vcftools)- 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfil>`###Format SNP Matrix
 - do this in R
 -  easier to do this outside of the cluster
 	-  `rsync user@sherlock.stanford.edu:<files> <path to location on your computer>- 	take 3 output files from vcftools and create one file
