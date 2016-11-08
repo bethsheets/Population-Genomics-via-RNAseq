@@ -46,7 +46,14 @@
 	- `scancel -u <username>` will cancel all jobs
 - to see how much memory your job has used so far
 	- ` sstat --format JobID,NTasks,nodelist,MaxRSS,MaxVMSize,AveRSS,AveVMSize $JOBNUMBER`###Best practices 🌊 :
- 🌊 `chmod 775 *` programs, scripts, some files that you create so others can use them
+ 🌊 Back up your scratch directory!
+You can use the Sherlock data transfer node to move large datasets onto a backup hard drive
+```
+kinit username@stanford.edu
+rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock-dtn.stanford.edu:/<sherlock directory> <backup location>
+```
+
+🌊 `chmod 775 *` programs, scripts, some files that you create so others can use them
 
 🌊 `chmod 444` files you don’t want to accidentally write over, 
 	`chmod -R ###` for directories
@@ -161,7 +168,10 @@
 -  step 2:
 	- create a file of good contigs	- `bash grep-good-contigs.sh all_parsed.txt assembly.fa`- 	step 3:	- pull only good contigs from your assembly file	- on cluster: 
 	- `sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`	- 	check your parsed outputs to see if there are taxa in there you don’t want and change/add them to the script- 	to check how filtering went:	- `grep -c “Contig” goodcontigs.txt`
-	- `grep -c "TRINITY" goodcontigs.txt`	- `grep -c “>” filteredassembly.fa`####Filtering other ideas - 	multiple blasts against different taxa (i.e. coral vs symbiont)- 	High stringency blast- 	Contig length cutoff- 	phylogenetically filtering, i.e. microbes using MEGAN, KRAKEN##TRANSCRIPTOME ANALYSIS###Map reads to assembly (Bowtie2) - 	[Bowtie2 ddownload](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
+	- `grep -c "TRINITY" goodcontigs.txt`	- `grep -c “>” filteredassembly.fa`####Filtering other ideas - 	multiple blasts against different taxa (i.e. coral vs symbiont)- 	High stringency blast- 	Contig length cutoff- 	phylogenetically filtering, i.e. microbes using MEGAN, KRAKEN
+
+####Check out characters about your assembly
+- `perl abyss-fac.pl <assembly.fa>##TRANSCRIPTOME ANALYSIS###Map reads to assembly (Bowtie2) - 	[Bowtie2 ddownload](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
 ```
 	# make a bowtie index from your final assembly   $ bowtie2-build <input.fa> <name_bt2index> 
