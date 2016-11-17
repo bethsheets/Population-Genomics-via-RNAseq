@@ -38,6 +38,7 @@
 	-  	`#SBATCH -p owners` access to 600 nodes only available to owners. You will be kicked off an owner node if that owner logs on. Always check your slurm file to see if your job was aborted
 	-  `#SBATCH -p spalumbi` 256GB memory node
 	-  `#SBATCH -p hns` 1TB memory node
+	-  you can list multiple nodes in your script with `#SBATCH -p spalumbi,hns`
 - to check on status of job
 	- squeue -u username
 	- squeue | grep 'spalumbi'
@@ -115,8 +116,8 @@ rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock
 	- `perl /share/PI/spalumbi/programs/ncbi-blast-2.3.0+/bin/update_blastdb.pl <database_directory>`- 	how to test blast script on small file:
 
 	```
-	$ sdev
-	$ head <assembly.fa> > <test_assembly.fa>	$ srun --mem=12000 —pty bash	$ blastx -db /share/PI/spalumbi/genbank_nr_Feb_2016/nr -query <test_assembly.fa> -out <test.out> -outfmt 11 &  
+	sdev
+	head <assembly.fa> > <test_assembly.fa>	srun --mem=12000 —pty bash	blastx -db /share/PI/spalumbi/genbank_nr_Feb_2016/nr -query <test_assembly.fa> -out <test.out> -outfmt 11 &  
 
 	```
 
@@ -125,20 +126,20 @@ rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock
 
 #### How to download & create the uniprot database for the first time:- 	[download Swiss-Prot & Trembl databases](http://www.uniprot.org/downloads)
 	```
+	wget <link>
+	gunzip <file>.gz
 	# merge two files into one database
-	$ cat uniprot_sprot.fasta uniprot_trembl.fasta > unitprot_db.fasta
-	# make your new fasta into a database   $ makeblastdb -in uniprot_db.fasta -dbtype prot -out uniprot_db   ```
+	cat uniprot_sprot.fasta uniprot_trembl.fasta > unitprot_db.fasta
+	# make your new fasta into a database   makeblastdb -in uniprot_db.fasta -dbtype prot -out uniprot_db   ```
 - usage: `bash batch-blast-uniprot.sh infile`
 	- the script above splits your assembly into smaller files and calls the blastx on your uniprot database
 - 	after running, check if you get an error during your blasts
 	- `cat slurm*` 
 	- most often, your blast may time out- if you get an error:
- 	```
- 		$ grep -B 1 error slurm*.out
-  		# for any file with error, take line before (the tempfile)		$ cat <TEMPwerror.fa> <TEMPwerror.fa> > <didnotfinish.fa>
-		$ this concatenates all TEMP files that contain an error into a new file
-		# you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file		$ bash batch-blast-uniprot.sh <didnotfinish.fa> #rerun script
-	```		
+ 	- `grep -B 1 error slurm*.out`
+  	- for any file with error, take line before (the tempfile)	- `cat <TEMPwerror.fa> <TEMPwerror.fa> > <didnotfinish.fa>`
+		- this concatenates all TEMP files that contain an error into a new file
+	- you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file	- `bash batch-blast-uniprot.sh <didnotfinish.fa>` 
 ###8b)Annotate with NCBI-nr database#### How to download & create the nr database for the first time
 - Make sure local database on sherlock is up to date- to open .tar files downloaded from genbank: 
 	`for i in *.tar ; do tar -xvf $i ; done &`
@@ -147,15 +148,13 @@ rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock
 	- splits your assembly into TEMP files for parallel processing- 	after running, check if you get an error during your blasts
 	- `cat slurm*` 
 	- most often, your blast may time out- if you get an error:
- 	```
- 	 	$ grep -B 1 error slurm*.out
-  		# for any file with error, take line before (the tempfile)		$ cat <TEMPwerror.fa> <TEMPwerror.fa> > <didnotfinish.fa>
-		$ this concatenates all TEMP files that contain an error into a new file
-		# you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file		$ bash batch-blast-uniprot.sh <didnotfinish.fa> #rerun script
-	```
+ 	- `grep -B 1 error slurm*.out`
+  	- for any file with error, take line before (the tempfile)	- `cat <TEMPwerror.fa> <TEMPwerror.fa> > <didnotfinish.fa>`
+		- this concatenates all TEMP files that contain an error into a new file
+	- you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file	- `bash batch-blast-uniprot.sh <didnotfinish.fa>`
 		
 ###8c)Reciprocal BLAST - 	`makeblastdb -in file.fasta -dbtype nucl -out file.fasta –parse_seqids`- 	can do this to check overlap between your multiple Trinity alignments 
-	-  does heterozygosity cause issues in your alignments
+	- i.e., does heterozygosity cause issues in your alignments?
 
 ###8d)Downloading a genome of interest to blast against
 - ex: Lottia giganteam 
