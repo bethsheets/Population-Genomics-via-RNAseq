@@ -78,15 +78,14 @@ rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock
 	- outputs 4 files: 1\_paired.fq, 2\_paired.fq, 1\_unpaired.fq, 2\_unpaired.fq
 -  for single end reads:
 	`batch-trimmomatic-se.sh`###2) Quality check (FastQC) 
-- this step is useful for picking samples to use in your Trinity assembly, for example: if you have >10 samples you may want to pick those with the highest quality sequencing.
-- this step is also helpful for PE data, where you use the length of your sequences for merging reads-  exmaple scripts that you need to update for your project:
-	-  	`example_fastqc_MKM.sh` or `fastqc_slurm_barnacles_mkm.sbatch`- 	Fastqc will generate an HTML file 
-- to move a file from cluster to your computer
+- this step is useful for picking samples to use in your Trinity assembly
+- this step is also helpful for PE data, where you use the length of your sequences for merging reads (i.e. FLASH)-  `batch-fastqc.sh`
+- to move a file from the cluster to your computer
+- open a terminal that is not logged into cluster
 	`rsync user@sherlock.stanford.edu:/share/PI/spalumbi/... /Users/username/Desktop/...`
-	- use `rsync -a` to transfer an entire directory
--  can use the output length stats for your FLASH input###3) Merge Paired End reads (FLASH) 
+	- use `rsync -a` to transfer an entire directory###3) Merge Paired End reads (FLASH) 
 - 	This step is necessary for PE data to merge your two reads (\_1 and \_2) that you will use in transcriptome assembly, but is not necessary for SE data 
--  use your quality outputs from FastQC - 	[webpage](https://ccb.jhu.edu/software/FLASH/)- 	get lengths of your trimmed seqs above and use in FLASH script- 	scripts: batch-flash.sh- 	You can pick samples with the best FLASH %assembled to use for your assembly###4) Pick what samples to assemble into a transcriptome  - 	pick samples relevant to your biological question- 	restrict sample # for computational capacity- 	can use FLASH results for quality filtering- 	Example assembly for population analysis: 
+-  use your quality outputs from FastQC - 	[webpage](https://ccb.jhu.edu/software/FLASH/)- 	get lengths of your trimmed seqs above and use in FLASH script- 	scripts: `batch-flash.sh`- 	You can pick samples with the best FLASH %assembled to use for your assembly###4) Pick what samples to assemble into a transcriptome  - 	pick samples relevant to your biological question- 	restrict sample # for computational capacity- 	can use FLASH results for quality filtering- 	Example assembly for population analysis: 
 	-  16 Balanus samples from Hopkins
 	-  we created 3 separate Trinity assemblies of 3 individuals with best FLASH merging scores
 		- the 3 Trinity assemblies ranged from 94,000 - 250,000 contigs
@@ -102,7 +101,7 @@ rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock
 	-  total pairs of reads = 34,835,117 is 35GB RAM and 35 hours of time###5b)Transcriptome assembly quality assessment - 	to get median contig length:
   ```
   $ samtools faidx Bg_2assembliesof3.fa  $ module load R  $ R  $ index<-read.delim(‘<file.fa.fai>’, header=F)  $ median(index[,2])  $ table(cut(index[,2],30)) #bins into groups of 30  $ table(index[,2]>300) #how many contigs are greater than 30bp
-  ```###6a)Take the longest Isoform from each contig - 	to call program: `perl longestisoform_trinity.pl <input.fasta> <output.fasta>`- 	this reduces computational load for CAP3###6b)If meta-assembling Trinity assemblies - 	rename contigs in one file by adding “a” to end of name- 	otherwise CAP3 may get confused if names are repeated- 	cat inputfile inputfile > all_assemblies.fasta###7)Meta-Assembly (CAP3) - 	[paper](http://genome.cshlp.org/content/9/9/868.full)- 	[manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)- 	CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity- 	to call program: `sbatch cap3.sh`- 	merge your contigs and singlets files into one assembly file	- `cat file.fasta.cap.contigs file.fasta.cap.singlets > newfile.fasta`
+  ```###6a)Take the longest Isoform from each contig - 	to call program: `perl longestisoform_trinity.pl <input.fasta> <output.fasta>`- 	this reduces computational load for CAP3###6b)If meta-assembling Trinity assemblies - 	rename contigs in one file by adding “a” to end of name- 	otherwise CAP3 may get confused if names are repeated- 	cat inputfile inputfile > all_assemblies.fasta###7)Meta-Assembly (CAP3) - 	[paper](http://genome.cshlp.org/content/9/9/868.full)- 	[manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)- 	CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity- 	to call program: `sbatch cap3.sh`- 	merge your contigs and singlets files into one assembly file	- `cat file.fasta.cap.contigs file.fasta.cap.singlets > newfile.fasta`
 	- contigs are what CAP3 merged, singlets did not merge and still contain the Trinity output name- 	to look at contig #s after CAP3:  
 	-  `grep -c '>' file.fasta`- 	to check for contig name duplicates: 
 	-   `grep ">" <assembly_file.fa> | perl histogram.pl | head -n`###8)Annotate (BLAST) - 	[Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
@@ -167,16 +166,16 @@ rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock
 -  step 2:
 	- create a file of good contigs	- `bash grep-good-contigs.sh all_parsed.txt assembly.fa`- 	step 3:	- pull only good contigs from your assembly file	- on cluster: 
 	- `sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`	- 	check your parsed outputs to see if there are taxa in there you don’t want and change/add them to the script- 	to check how filtering went:	- `grep -c “Contig” goodcontigs.txt`
-	- `grep -c "TRINITY" goodcontigs.txt`	- `grep -c “>” filteredassembly.fa`####Filtering other ideas - 	multiple blasts against different taxa (i.e. coral vs symbiont)- 	High stringency blast- 	Contig length cutoff- 	phylogenetically filtering, i.e. microbes using MEGAN, KRAKEN
+	- `grep -c "TRINITY" goodcontigs.txt`	- `grep -c “^>” filteredassembly.fa`####Filtering other ideas - 	multiple blasts against different taxa (i.e. coral vs symbiont)- 	High stringency blast- 	Contig length cutoff- 	phylogenetic filtering, i.e. microbes using MEGAN, KRAKEN
 
 ####Check out characters about your assembly
-- `perl abyss-fac.pl <assembly.fa>##TRANSCRIPTOME ANALYSIS###Map reads to assembly (Bowtie2) - 	[Bowtie2 ddownload](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
+- `perl abyss-fac.pl <assembly.fa>`##TRANSCRIPTOME ANALYSIS###Map reads to assembly (Bowtie2) - 	[Bowtie2 download](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
 ```
 	# make a bowtie index from your final assembly   $ bowtie2-build <input.fa> <name_bt2index> 
    # check that it outputs 6 files .bt2
    # Option 1: PE reads
-   $ bash batch-bowtie2-fq-paired.sh b2index 1 *notCombined_1.fastq
+   $ bash batch-bowtie2-fq-paired.sh b2index 1 *_1.txt.gz
    #check TEMPBATCH.sbatch after submitting to see if it started correctly 
    $ cat TEMPBATCH.sbatch   # after it completes, check for errors   $ cat slurm*
    # if rerunning, make sure you remove files that don't allow writing over, i.e.
