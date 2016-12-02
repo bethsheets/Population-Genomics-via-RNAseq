@@ -80,6 +80,12 @@ You can use the Sherlock data transfer node to move large datasets onto a backup
 kinit username@stanford.edu
 rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock-dtn.stanford.edu:/<sherlock directory> <backup location>
 ```
+You can use your Stanford Google Drive (with unlimited storage) to back up your files
+```
+ml load gdrive
+gdrive -help
+gdrive upload --recursive <path>
+```
 
 🌊 `chmod 775 *` programs, scripts, some files that you create so others can use them
 
