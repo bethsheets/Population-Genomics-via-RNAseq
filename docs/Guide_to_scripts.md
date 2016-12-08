@@ -87,6 +87,9 @@ gdrive -help
 gdrive upload --recursive <path>
 ```
 
+Check to see how much space you're taking up in the shared SCRATCH directory
+`du -sh * | sort -h`
+
 🌊 `chmod 775 *` programs, scripts, some files that you create so others can use them
 
 🌊 `chmod 444` files you don’t want to accidentally write over, 
@@ -632,9 +635,9 @@ mkdir vcfout #in same directory as your flash merged samples
 sbatch freebayes-cluster.sh assembly.fa vcfout contiglist ncpu *bam
 
 ```- if not using cluster script, see `freebayes-sequential-intervals.sbatch`###Filter SNPs (vcflib)- 	[vcflib website](https://github.com/vcflib/vcflib#vcflib)- 	[vcflib scripts](https://github.com/vcflib/vcflib/tree/master/scripts)- 	can filter for: read depth, read mapping quality, base quality, minor allele frequency- 	step 1: 
--  `$ fastVCFcombine.sh <outfile> *.vcf`- 	step 2, option 1: filter by genotype (i.e. all individuals must have a quality score of 30 at that SNP)- 	`$ sbatch vcf-filter-nomissing-maf05-allgq30.sh #samples <outfile> *.vcf`- 	step 2, option 2: filter by locus with quality score of 30- `$ sbatch vcf-filter-nomissing-maf05-qual30.sh #samples <outfile> *.vcf`
+-  `$ fastVCFcombine.sh <outfile> *.vcf`- 	step 2, option 1: filter by genotype (i.e. all individuals must have a quality score of 30 at that SNP)- 	`$ sbatch vcf-filter-nomissing-maf05-allgq30.sh <combined>.vcf`- 	step 2, option 2: filter by locus with quality score of 30- `$ sbatch vcf-filter-nomissing-maf05-qual30.sh <combined>.vcf`
 - step 2, option 3: filter for eSNPs
-- `$ sbatch vcf-filter-nomissing-maf05-eSNPs.sh #samples <outfile> *.vcf`###Create 0,1,2 genotype SNP matrix (vcftools)- 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfil>`###Format SNP Matrix
+- `$ sbatch vcf-filter-nomissing-maf05-eSNPs.sh <combined>.vcf`###Create 0,1,2 genotype SNP matrix (vcftools)- 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfil>`###Format SNP Matrix
 - do this in R
 -  easier to do this outside of the cluster
 	-  `rsync user@sherlock.stanford.edu:<files> <path to location on your computer>- 	take 3 output files from vcftools and create one file
