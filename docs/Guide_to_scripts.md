@@ -678,4 +678,4 @@ library(DESeq2) counts<-read.delim(‘counts.txt,row.names=1) cds<-DESeqDataSe
 	-  `$ samtools view -bh <file.bam> "Contigname" > <outfile.bam>`
 -  convert bam to fasta for viewing
 		-  `$ samtools bam2fq <infile.bam> | seqtk seq -A > <outfile.fa>`
->>>>>>> Stashed changes
+
