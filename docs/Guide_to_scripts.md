@@ -11,8 +11,7 @@
 - [Sherlock Wiki] (http://sherlock.stanford.edu/mediawiki/index.php/Main_Page)
 - To configure your SSH client to pass those Kerberos credentials for MAC, open terminal (Click Spotlight, type in terminal) and run the following commands:
 ```
-<<<<<<< Updated upstream
-	$mkdir -p ~/.ssh 
+	mkdir -p ~/.ssh 
 	echo "Host sherlock sherlock.stanford.edu sherlock* sherlock*.stanford.edu   
 	GSSAPIDelegateCredentials yes   
 	GSSAPIAuthentication yes" >> ~/.ssh/config 
@@ -29,7 +28,7 @@
 
 ###Sherlock basics 
 
-- `kinit user@stanford.edu` & type in pw
+- `kinit user@stanford.edu` & type in pw to gain permission
 - `ssh user@sherlock.stanford.edu` to access cluster
 - `$HOME` your personal directory
 	 - limited to 15GB storage
@@ -192,9 +191,9 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 - 	this reduces computational load for CAP3
 
 ###6b)If meta-assembling Trinity assemblies 
-- 	rename contigs in one file by adding “a” to end of name
+- 	rename contigs in one file by adding “a” to end of file name, for ex: "TRINITYa_blahblah"
 - 	otherwise CAP3 may get confused if names are repeated
-- 	cat inputfile inputfile > all_assemblies.fasta
+- 	`cat Trinityrun1.fa Trinityrun2.fa > all_assemblies.fasta`
 
 ###7)Meta-Assembly (CAP3) 
 - 	[paper](http://genome.cshlp.org/content/9/9/868.full)
@@ -234,6 +233,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 - 	Uniprot is a more curated database and is recommended over NCBI-nr
 
 
+
 #### How to download & create the uniprot database for the first time:
 - 	[download Swiss-Prot & Trembl databases](http://www.uniprot.org/downloads)
 
@@ -245,6 +245,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	# make your new fasta into a database
    makeblastdb -in uniprot_db.fasta -dbtype prot -out uniprot_db
    ```
+### Run uniprot blast
 - usage: `bash batch-blast-uniprot.sh infile`
 	- the script above splits your assembly into smaller files and calls the blastx on your uniprot database
 - 	after running, check if you get an error during your blasts
@@ -289,6 +290,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 - `makeblastdb `
 
 ### 9)Parse XML blast files
+- Both the uniprot and nr batch scripts above output XML formatted results
 - XML files are difficult to work with, pick what information you want and parse to a tab delimited
 - XML files currently hold the most information about each blast result
 	- i.e. gene name, taxonomy 
@@ -298,7 +300,8 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	- `python parse-uniprot-xml.py`
 
 ### 10)Filter Assembly 
-- 	remove blasts that are likely environmental contamination, i.e. bacteria, fungi, viruses, alveolata, viridiplantae, haptophyceae, etc. 
+- If you BLAST to a general database and not to a specific genome, this step is necessary
+- remove blasts that are likely environmental contamination, i.e. bacteria, fungi, viruses, alveolata, viridiplantae, haptophyceae, etc. 
 - 	step 1:
 	- `cat *_parsed.txt > all_parsed.txt` #combine all your parsed blast results
 -  step 2:
@@ -323,6 +326,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 
 ####Check out characters about your assembly
 - `perl abyss-fac.pl <assembly.fa>`
+- number of contigs, mean length of contigs, etc.
 
 ##TRANSCRIPTOME ANALYSIS
 
@@ -331,21 +335,20 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 
 ```
 	# make a bowtie index from your final assembly
-   $ bowtie2-build <input.fa> <name_bt2index> 
+   bowtie2-build <input.fa> <name_bt2index> 
    # check that it outputs 6 files .bt2
    # Option 1: PE reads
-   $ bash batch-bowtie2-fq-paired.sh b2index 1 *_1.txt.gz
+   bash batch-bowtie2-fq-paired.sh b2index 1 *_1.txt.gz
    #check TEMPBATCH.sbatch after submitting to see if it started correctly 
-   $ cat TEMPBATCH.sbatch
+   cat TEMPBATCH.sbatch
    # after it completes, check for errors
-   $ cat slurm*
+   cat slurm*
    # if rerunning, make sure you remove files that don't allow writing over, i.e.
-   $ rm -metrics.txt 
+   rm -metrics.txt 
 ```
 
 ####other Bowtie2 script options:
-- batch-bowtie-fq-flash.sh 
-	- if you used flash on your PE reads
+- there are several other bowtie2 scripts available in the scripts folder for SE reads, flash merged reads, etc. 
 
 
 	
@@ -366,15 +369,18 @@ sbatch freebayes-cluster.sh assembly.fa vcfout contiglist ncpu *bam
 ###Filter SNPs (vcflib)
 - 	[vcflib website](https://github.com/vcflib/vcflib#vcflib)
 - 	[vcflib scripts](https://github.com/vcflib/vcflib/tree/master/scripts)
-- 	can filter for: read depth, read mapping quality, base quality, minor allele frequency
+- 	can filter for: read depth, read mapping quality, base quality, minor allele frequency, min number of reads mapped, etc.
 - 	step 1: 
 -  `$ fastVCFcombine.sh <outfile> *.vcf`
 - 	step 2, option 1: filter by genotype (i.e. all individuals must have a quality score of 30 at that SNP)
 - 	`$ sbatch vcf-filter-nomissing-maf05-allgq30.sh #samples <outfile> *.vcf`
+-  this is our most strict filter
 - 	step 2, option 2: filter by locus with quality score of 30
 - `$ sbatch vcf-filter-nomissing-maf05-qual30.sh #samples <outfile> *.vcf`
+- this is slightly less strict and may output more SNPs than the script above
 - step 2, option 3: filter for eSNPs
 - `$ sbatch vcf-filter-nomissing-maf05-eSNPs.sh #samples <outfile> *.vcf`
+- this filter uses min number of mapped reads instead of GQ score because we expect eSNP alternates to have different numbers of reads
 
 ###Create 0,1,2 genotype SNP matrix (vcftools)
 - 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfil>`
