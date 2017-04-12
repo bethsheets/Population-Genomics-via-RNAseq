@@ -3,7 +3,6 @@
 ## GENERAL INFORMATION
 * Scripts are formatted for Stanford internal use. We use SLURM to send jobs to Stanford's Sherlock cluster.
 
-
 ### How to create a Sherlock account 
 - to get access and support, e-mail research-computing-support[at]stanford.edu
 - download [Kerberos](https://uit.stanford.edu/service/kerberos)
