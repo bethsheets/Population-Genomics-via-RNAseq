@@ -30,8 +30,8 @@
 
 - to log in:
 	```
-	kinit user@stanford.edu` & type in pw to gain permission
-	ssh user@sherlock.stanford.edu` to access cluster
+	kinit user@stanford.edu & type in pw to gain permission
+	ssh user@sherlock.stanford.edu to access cluster
 	```
 
 - to move around:
