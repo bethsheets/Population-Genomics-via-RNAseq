@@ -2,10 +2,10 @@
 
 ##GENERAL INFORMATION
 
-###* Scripts are formatted for Stanford internal use. We use SLURM to send jobs to Stanford's Sherlock cluster.
+### * Scripts are formatted for Stanford internal use. We use SLURM to send jobs to Stanford's Sherlock cluster.
 
 
-###How to create a Sherlock account 
+### How to create a Sherlock account 
 - to get access and support, e-mail research-computing-support[at]stanford.edu
 - download [Kerberos](https://uit.stanford.edu/service/kerberos)
 - [Sherlock Wiki] (http://sherlock.stanford.edu/mediawiki/index.php/Main_Page)
@@ -21,12 +21,12 @@
 - your personal `$HOME` is 15GB
 - [more info on Sherlock storage](http://sherlock.stanford.edu/mediawiki/index.php/DataStorage)
 
-###Downloading & storing data 
+### Downloading & storing data from Gnomex
 - install [fdt.jar](http://monalisa.cern.ch/FDT/) in your chosen Sherlock directory
 - use command line from Gnomex to download to Sherlock
 - backup raw files on external harddrive in lab
 
-###Sherlock basics 
+### Sherlock basics 
 
 - `kinit user@stanford.edu` & type in pw to gain permission
 - `ssh user@sherlock.stanford.edu` to access cluster
@@ -39,18 +39,21 @@
 	 - `cd $PI_HOME/programs`
 	 - `wget <linktofiledownload>`
 	 - `unzip <file>` or `gzip <file.gz>` 
+
+	 
 - 	modifying your path to include scripts & programs:
 	-  this allows you to access these directories from any directory without having to hardcode the path
 	 
 	 ```
-	 $ cd ~
-	 $ ls -a #list hidden items
-	 $ nano .bashrc
+	 cd ~
+	 ls -a #list hidden items
+	 nano .bashrc
 	 #paste the following into your .bashrc
-	 $ export PATH="$PI_HOME/programs:$PATH"
-	 $ export PATH="$PI_HOME/scripts:$PATH"
-	 $ export PATH="/share/PI/spalumbi/programs/anaconda/bin:$PATH"
+	 export PATH="$PI_HOME/programs:$PATH"
+	 export PATH="$PI_HOME/scripts:$PATH"
+	 export PATH="/share/PI/spalumbi/programs/anaconda/bin:$PATH"
 	 ```
+
 - 	`login_node` for moving around sherlock
 - 	`sdev` a node for running small test jobs straight from the command line
 	- one hour time limit
@@ -61,7 +64,8 @@
 	-  	`#SBATCH -p owners` access to 600 nodes only available to owners. You will be kicked off an owner node if that owner logs on. Always check your slurm file to see if your job was aborted
 	-  `#SBATCH -p spalumbi` 256GB memory node
 	-  `#SBATCH -p hns` 1TB memory node
-	-  you can list multiple nodes in your script with `#SBATCH -p spalumbi,hns`
+	-  you can list multiple nodes in your script with:
+		-  `#SBATCH -p spalumbi,hns`
 - to check on status of job
 	- squeue -u username
 	- squeue | grep 'spalumbi'
@@ -71,7 +75,7 @@
 - to see how much memory your job has used so far
 	- ` sstat --format JobID,NTasks,nodelist,MaxRSS,MaxVMSize,AveRSS,AveVMSize $JOBNUMBER`
 
-###Best practices 🌊 :
+### Best practices 🌊 :
  
 🌊 Back up your scratch directory!
 You can use the Sherlock data transfer node to move large datasets onto a backup hard drive
@@ -116,9 +120,9 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 
 
 
-##DE NOVO TRANSCRIPTOME ASSEMBLY
+## DE NOVO TRANSCRIPTOME ASSEMBLY
 
-###1) Trim & Clip (Trimmomatic) 
+### 1) Trim & Clip (Trimmomatic) 
 - this program removes adapters, low quality seqs, etc.
 - [webpage](http://www.usadellab.org/cms/?page=trimmomatic)
 -  for paired end reads:
@@ -128,7 +132,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	`batch-trimmomatic-se.sh`
 
 
-###2) Quality check (FastQC) 
+### 2) Quality check (FastQC) 
 - this step is useful for picking samples to use in your Trinity assembly
 - this step is also helpful for PE data, where you use the length of your sequences for merging reads (i.e. FLASH)
 -  `batch-fastqc.sh`
@@ -137,7 +141,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	`rsync user@sherlock.stanford.edu:/share/PI/spalumbi/... /Users/username/Desktop/...`
 	- use `rsync -a` to transfer an entire directory
 
-###3) Merge Paired End reads (FLASH) 
+### 3) Merge paired end reads (FLASH) 
 - 	This step is necessary for PE data to merge your two reads (\_1 and \_2) that you will use in transcriptome assembly, but is not necessary for SE data 
 -  use your quality outputs from FastQC 
 - 	[webpage](https://ccb.jhu.edu/software/FLASH/)
@@ -146,7 +150,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 - 	You can pick samples with the best FLASH %assembled to use for your assembly
 
 
-###4) Pick what samples to assemble into a transcriptome  
+### 4) Pick what samples to assemble into a transcriptome  
 - 	pick samples relevant to your biological question
 - 	restrict sample # for computational capacity
 - 	can use FLASH results for quality filtering
@@ -161,7 +165,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 			- Trinity assembly of 8 individuals: 930,000 contigs and 830,000 longest isoforms
 			- CAP3 meta assembly of 3 Trinity assemblies (each made of 3 individuals, 9 individuals total): 200,000 contigs+singlets
 
-###5a) De novo assembly (Trinity) 
+### 5a) De novo assembly (Trinity) 
 - 	[Trinity wiki] (https://github.com/trinityrnaseq/trinityrnaseq/wiki)
 - 	to see insides of Trinity: 
 	-  	`.Trinity --show_full_usage_info`
@@ -172,7 +176,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	- 	Example: 3 Balanus samples: 11649437 + 11728787 + 11556893
 	-  total pairs of reads = 34,835,117 is 35GB RAM and 35 hours of time
 
-###5b)Transcriptome assembly quality assessment 
+### 5b)Transcriptome assembly quality assessment 
 
 - 	to get median contig length:
 
@@ -186,16 +190,16 @@ Check to see how much space you're taking up in the shared SCRATCH directory
   $ table(index[,2]>300) #how many contigs are greater than 30bp
   ```
 
-###6a)Take the longest Isoform from each contig 
+### 6a)Take the longest Isoform from each contig 
 - 	to call program: `perl longestisoform_trinity.pl <input.fasta> <output.fasta>`
 - 	this reduces computational load for CAP3
 
-###6b)If meta-assembling Trinity assemblies 
+### 6b)If meta-assembling Trinity assemblies 
 - 	rename contigs in one file by adding “a” to end of file name, for ex: "TRINITYa_blahblah"
 - 	otherwise CAP3 may get confused if names are repeated
 - 	`cat Trinityrun1.fa Trinityrun2.fa > all_assemblies.fasta`
 
-###7)Meta-Assembly (CAP3) 
+### 7)Meta-Assembly (CAP3) 
 - 	[paper](http://genome.cshlp.org/content/9/9/868.full)
 - 	[manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)
 - 	CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity
@@ -208,11 +212,11 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 - 	to check for contig name duplicates: 
 	-   `grep ">" <assembly_file.fa> | perl histogram.pl | head -n`
 
-###8)Annotate (BLAST) 
+### 8)Annotate (BLAST) 
 - 	[Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
 -  [blastx commands, table C4](http://www.ncbi.nlm.nih.gov/books/NBK279675/)
 
-####How to download and create a blast database on your cluster
+#### How to download and create a blast database on your cluster
 - download your database
 	- ex: uniprot, blast-nr, genome of species of interest
 - to open .tar files downloaded from genbank: 
@@ -229,7 +233,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 
 	```
 
-###8a)Annotate with Uniprot database
+### 8a)Annotate with Uniprot database
 - 	Uniprot is a more curated database and is recommended over NCBI-nr
 
 
@@ -259,7 +263,7 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	- you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file
 	- `bash batch-blast-uniprot.sh <didnotfinish.fa>` 
 
-###8b)Annotate with NCBI-nr database
+### 8b)Annotate with NCBI-nr database
 #### How to download & create the nr database for the first time
 - Make sure local database on sherlock is up to date
 - to open .tar files downloaded from genbank: 
@@ -279,12 +283,12 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	- you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file
 	- `bash batch-blast-uniprot.sh <didnotfinish.fa>`
 		
-###8c)Reciprocal BLAST 
+### 8c)Reciprocal BLAST 
 - 	`makeblastdb -in file.fasta -dbtype nucl -out file.fasta –parse_seqids`
 - 	can do this to check overlap between your multiple Trinity alignments 
 	- i.e., does heterozygosity cause issues in your alignments?
 
-###8d)Downloading a genome of interest to blast against
+### 8d)Downloading a genome of interest to blast against
 - ex: Lottia giganteam 
 - download cDNA files for blasting your nucleotides against real transcripts
 - `makeblastdb `
@@ -318,19 +322,19 @@ Check to see how much space you're taking up in the shared SCRATCH directory
 	- `grep -c “^>” filteredassembly.fa`
 
 
-####Filtering other ideas 
+#### Filtering other ideas 
 - 	multiple blasts against different taxa (i.e. coral vs symbiont)
 - 	High stringency blast
 - 	Contig length cutoff
 - 	phylogenetic filtering, i.e. microbes using MEGAN, KRAKEN
 
-####Check out characters about your assembly
+#### Check out characters about your assembly
 - `perl abyss-fac.pl <assembly.fa>`
 - number of contigs, mean length of contigs, etc.
 
-##TRANSCRIPTOME ANALYSIS
+## TRANSCRIPTOME ANALYSIS
 
-###Map reads to assembly (Bowtie2) 
+### Map reads to assembly (Bowtie2) 
 - 	[Bowtie2 download](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
 ```
@@ -347,14 +351,14 @@ Check to see how much space you're taking up in the shared SCRATCH directory
    rm -metrics.txt 
 ```
 
-####other Bowtie2 script options:
+#### other Bowtie2 script options:
 - there are several other bowtie2 scripts available in the scripts folder for SE reads, flash merged reads, etc. 
 
 
 	
-##SNP CALLING, FILTERING, & ANALYSIS
+## SNP CALLING, FILTERING, & ANALYSIS
 
-###SNP Calling (Freebayes) 
+### SNP Calling (Freebayes) 
 - 	step 1: make a contig list for input into freebayes
 - 	`bash fasta2bed.sh assembly.fa outfile`
 - step 2:
@@ -366,7 +370,7 @@ sbatch freebayes-cluster.sh assembly.fa vcfout contiglist ncpu *bam
 ```
 - if not using cluster script, see `freebayes-sequential-intervals.sbatch`
 
-###Filter SNPs (vcflib)
+### Filter SNPs (vcflib)
 - 	[vcflib website](https://github.com/vcflib/vcflib#vcflib)
 - 	[vcflib scripts](https://github.com/vcflib/vcflib/tree/master/scripts)
 - 	can filter for: read depth, read mapping quality, base quality, minor allele frequency, min number of reads mapped, etc.
@@ -382,10 +386,10 @@ sbatch freebayes-cluster.sh assembly.fa vcfout contiglist ncpu *bam
 - `$ sbatch vcf-filter-nomissing-maf05-eSNPs.sh #samples <outfile> *.vcf`
 - this filter uses min number of mapped reads instead of GQ score because we expect eSNP alternates to have different numbers of reads
 
-###Create 0,1,2 genotype SNP matrix (vcftools)
-- 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfil>`
+### Create 0,1,2 genotype SNP matrix (vcftools)
+- 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfile>`
 
-###Format SNP Matrix
+### Format SNP Matrix
 - do this in R
 -  easier to do this outside of the cluster
 	-  `rsync user@sherlock.stanford.edu:<files> <path to location on your computer>
@@ -407,29 +411,29 @@ plot(pc.out$x[,1],pc.out$x[,2])	#PC1 v PC2
 
 ```
 
-###Add Meta data to Matrix 
+### Add Meta data to Matrix 
 - 	make a meta data file with info about individuals (location, date, etc.)
 - 	make sure your meta file is ordered the same as your vcfs! (i.e. ls your samples in the terminal to see their order)
 - script TBD
 
 
-###Test for loci under selection (BayeScan)
+### Test for loci under selection (BayeScan)
 - [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)
 - 	identifies putative loci under selection
 
-##GENE EXPRESSION ANALYSIS 
+## GENE EXPRESSION ANALYSIS 
 
-###Expression counts
+### Expression counts
 - `bash get-bam-counts.sh *.bam`
 
 
-###WGCNA 
+### WGCNA 
 - in program R
 - [website](https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/)
 - script TBD
 
 
-###Gene expression (DESeq2)
+### Gene expression (DESeq2)
 - use this program in R
 
 ```
@@ -442,13 +446,11 @@ sig<-res[which(res$padj<0.05),]
 write.table(sig,file=‘DEcontigs.txt’,quote=F,sep=‘\t') 
 ```
 
-###Samtools
+### Samtools
 - [manual](http://www.htslib.org/doc/samtools.html)
 - to view reads mapped to contig of interest
-	- `$ samtools tview <sample.bam> <assembly.fa>`
-	- `$ g` #type in contig name of interest
-
-	- create a file of one contig
-	-  `$ samtools view -bh <file.bam> "Contigname" > <outfile.bam>`
+	- `samtools tview <sample.bam> <assembly.fa>`
+- create a file of one contig
+	-  `samtools view -bh <file.bam> "Contigname" > <outfile.bam>`
 -  convert bam to fasta for viewing
-		-  `$ samtools bam2fq <infile.bam> | seqtk seq -A > <outfile.fa>`
+	-  `samtools bam2fq <infile.bam> | seqtk seq -A > <outfile.fa>`
