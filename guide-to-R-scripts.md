@@ -48,7 +48,11 @@ plot(pc.out$x[,1],pc.out$x[,2])	#PC1 v PC2
 
 
 ### Allow for missing SNP data with SNPrelate
-- 
+-
+
+### Look at ancestry with admixture
+- you will need to make a plink file from your vcf file instead of using your 012 matrix
+
 
 ### Test for loci under selection using BayeScan
 - [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)
