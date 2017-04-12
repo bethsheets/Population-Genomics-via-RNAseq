@@ -195,72 +195,61 @@ gdrive upload --recursive <path>
   $ table(index[,2]>300) #how many contigs are greater than 30bp
   ```
 
-- another option ofr number of contigs, contig n50, etc.
+- another option for number of contigs, contig n50, etc.
 `perl abyss-fac.pl <assembly.fa>`
 
 ### 6a)Take the longest Isoform from each contig 
-- 	to call program: `perl longestisoform_trinity.pl <input.fasta> <output.fasta>`
-- 	this reduces computational load for CAP3
+`perl longestisoform_trinity.pl <input.fasta> <output.fasta>`
 
 ### 6b)If meta-assembling Trinity assemblies 
-- 	rename contigs in one file by adding “a” to end of file name, for ex: "TRINITYa_blahblah"
-- 	otherwise CAP3 may get confused if names are repeated
-- 	`cat Trinityrun1.fa Trinityrun2.fa > all_assemblies.fasta`
+- rename contigs in one file by adding “a” to end of file name, for ex: "TRINITYa_blahblah"
+	- otherwise CAP3 may get confused if names are repeated
+	
+`cat Trinityrun1.fa Trinityrun2.fa > all_assemblies.fasta`
 
 ### 7)Meta-Assembly (CAP3) 
-- 	[paper](http://genome.cshlp.org/content/9/9/868.full)
-- 	[manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)
-- 	CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity
-- 	to call program: `sbatch cap3.sh`
-- 	merge your contigs and singlets files into one assembly file
-	- `cat file.fasta.cap.contigs file.fasta.cap.singlets > newfile.fasta`
+- [paper](http://genome.cshlp.org/content/9/9/868.full)
+- [manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)
+- CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity
+
+`sbatch cap3.sh`
+
+- merge your contigs and singlets files into one assembly file
+`cat file.fasta.cap.contigs file.fasta.cap.singlets > newfile.fasta`
 	- contigs are what CAP3 merged, singlets did not merge and still contain the Trinity output name
-- 	to look at contig #s after CAP3:  
-	-  `grep -c '>' file.fasta`
-- 	to check for contig name duplicates: 
-	-   `grep ">" <assembly_file.fa> | perl histogram.pl | head -n`
+	
+- to look at contig #s after CAP3:  
+`grep -c '>' file.fasta`
+
+- to check for contig name duplicates: 
+`grep ">" <assembly_file.fa> | perl histogram.pl | head -n`
 
 ### 8)Annotate (BLAST) 
-- 	[Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
+-  [Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
 -  [blastx commands, table C4](http://www.ncbi.nlm.nih.gov/books/NBK279675/)
-
-#### How to download and create a blast database on your cluster
-- download your database
-	- ex: uniprot, blast-nr, genome of species of interest
-- to open .tar files downloaded from genbank: 
-	`for i in *.tar ; do tar -xvf $i ; done &`
-- to update an exisitng database (i.e. blast-nr)
-	- `perl /share/PI/spalumbi/programs/ncbi-blast-2.3.0+/bin/update_blastdb.pl <database_directory>`
-- 	how to test blast script on small file:
-
-	```
-	sdev
-	head <assembly.fa> > <test_assembly.fa>
-	srun --mem=12000 —pty bash
-	blastx -db /share/PI/spalumbi/genbank_nr_Feb_2016/nr -query <test_assembly.fa> -out <test.out> -outfmt 11 &  
-
-	```
 
 ### 8a)Annotate with Uniprot database
 - 	Uniprot is a more curated database and is recommended over NCBI-nr
 
-
-
-#### How to download & create the uniprot database for the first time:
-- 	[download Swiss-Prot & Trembl databases](http://www.uniprot.org/downloads)
+#### How to download & create the Uniprot/Trembl database for the first time:
+- [download Swiss-Prot & Trembl databases](http://www.uniprot.org/downloads)
 
 	```
 	wget <link>
 	gunzip <file>.gz
-	# merge two files into one database
+	
+	# merge two database files into one database
 	cat uniprot_sprot.fasta uniprot_trembl.fasta > unitprot_db.fasta
+	
 	# make your new fasta into a database
-   makeblastdb -in uniprot_db.fasta -dbtype prot -out uniprot_db
-   ```
+        makeblastdb -in uniprot_db.fasta -dbtype prot -out uniprot_db
+   	```
+
 ### Run uniprot blast
--`bash batch-blast-uniprot.sh infile`
+`bash batch-blast-uniprot.sh infile`
 	- the script above splits your assembly into smaller files and calls the blastx on your uniprot database
-- 	after running, check if you get an error during your blasts
+	
+- after running, check if you get an error during your blasts
 	- `cat slurm*` 
 	- most often, your blast may time out
 - if you get an error:
@@ -275,14 +264,15 @@ gdrive upload --recursive <path>
 #### How to download & create the nr database for the first time
 - Make sure local database on sherlock is up to date
 - to open .tar files downloaded from genbank: 
-	`for i in *.tar ; do tar -xvf $i ; done &`
+	- `for i in *.tar ; do tar -xvf $i ; done &`
 	- blast-nr files are already databases, no need to use makedb script
-- 	usage
+
+- To run blast script:
 	- `bash batch-blast-nr.sh`
-	- splits your assembly into TEMP files for parallel processing
-- 	after running, check if you get an error during your blasts
+	- this script splits your assembly into TEMP files for parallel processing
+- after running, check if you get an error during your blasts
 	- `cat slurm*` 
-	- most often, your blast may time out
+	- your blast search may time out if it runs too long on the cluster
 - if you get an error:
  	- `grep -B 1 error slurm*.out`
   	- for any file with error, take line before (the tempfile)
@@ -292,168 +282,97 @@ gdrive upload --recursive <path>
 	- `bash batch-blast-uniprot.sh <didnotfinish.fa>`
 		
 ### 8c)Reciprocal BLAST 
--`makeblastdb -in file.fasta -dbtype nucl -out file.fasta –parse_seqids`
-- 	can do this to check overlap between your multiple Trinity alignments 
+`makeblastdb -in file.fasta -dbtype nucl -out file.fasta –parse_seqids`
+- can do this to check overlap between your multiple Trinity alignments 
 	- i.e., does heterozygosity cause issues in your alignments?
 
 ### 8d)Downloading a genome of interest to blast against
 - download cDNA files for blasting your nucleotides against real transcripts
--`makeblastdb `
+- use the makeblastdb tool from ncbi to make a database (similar to above)
 
 ### 9)Parse XML blast files
 - Both the uniprot and nr batch scripts above output XML formatted results
-- XML files are difficult to work with, pick what information you want and parse to a tab delimited
+- XML files are difficult to work with, pick what information you want and parse to a tab delimited format
 - XML files currently hold the most information about each blast result
 	- i.e. gene name, taxonomy 
-- 	to submit to cluster:
-	-  `bash batch-parse-uniprot.sh`
-- 	usage in sdev on small file
-	- `python parse-uniprot-xml.py`
+- to parse your files:
+`bash batch-parse-uniprot.sh`
+	- this script calls parse-uniprot-xml.py on your many temp files
 
 ### 10)Filter Assembly 
-- If you BLAST to a general database and not to a specific genome, this step is necessary
-- remove blasts that are likely environmental contamination, i.e. bacteria, fungi, viruses, alveolata, viridiplantae, haptophyceae, etc. 
-- 	step 1:
-	- `cat *_parsed.txt > all_parsed.txt` #combine all your parsed blast results
--  step 2:
-	- create a file of good contigs
-	- `bash grep-good-contigs.sh all_parsed.txt assembly.fa`
-- 	step 3:
-	- pull only good contigs from your assembly file
-	- on cluster: 
-	- `sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`
-	- 	check your parsed outputs to see if there are taxa in there you don’t want and change/add them to the script
-- 	to check how filtering went:
-	- `grep -c “Contig” goodcontigs.txt`
-	- `grep -c "TRINITY" goodcontigs.txt`
-	- `grep -c “^>” filteredassembly.fa`
+- If you BLAST to a general database and not to a specific genome, this step is necessary to filter out any contamination
+- remove blasts that are likely environmental contamination, i.e. bacteria, fungi, viruses, alveolata, viridiplantae, haptophyceae, etc.
 
+- first,  merge all of your parsed blast results into one file
+`cat *_parsed.txt > all_parsed.txt`
 
-#### Filtering other ideas 
-- 	multiple blasts against different taxa (i.e. coral vs symbiont)
-- 	High stringency blast
-- 	Contig length cutoff
-- 	phylogenetic filtering, i.e. microbes using MEGAN, KRAKEN
+-  second, create a file of only 'good contigs', i.e. metazoans:
+`bash grep-good-contigs.sh all_parsed.txt assembly.fa`
+
+- third, pull only good contigs from your assembly fasta file
+`sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`
+
+- to check how filtering went, count how many contigs you have before and after filtering:
+```
+	grep -c “Contig” goodcontigs.txt
+	grep -c "TRINITY" goodcontigs.txt
+	grep -c “^>” filteredassembly.fa
+```
 
 ## TRANSCRIPTOME ANALYSIS
 
 ### Map reads to assembly (Bowtie2) 
-- 	[Bowtie2 download](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
+- [Bowtie2 download](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
 ```
-	# make a bowtie index from your final assembly
-   bowtie2-build <input.fa> <name_bt2index> 
-   # check that it outputs 6 files .bt2
-   # Option 1: PE reads
+   # first, make a bowtie index from your final assembly, this should output 6 files
+   bowtie2-build <assembly.fa> b2index
+   
+   #next, call the script on your raw (i.e. untrimmed/clipped files)
    bash batch-bowtie2-fq-paired.sh b2index 1 *_1.txt.gz
+   
    #check TEMPBATCH.sbatch after submitting to see if it started correctly 
    cat TEMPBATCH.sbatch
-   # after it completes, check for errors
+  
+   #after it completes, check for errors by printing your slurm files to the screen
    cat slurm*
-   # if rerunning, make sure you remove files that don't allow writing over, i.e.
-   rm -metrics.txt 
 ```
 
 #### other Bowtie2 script options:
-- there are several other bowtie2 scripts available in the scripts folder for SE reads, flash merged reads, etc. 
-
+- there are several other bowtie2 scripts available in the scripts folder, for example:
+	- for single-end reads 
+	- if you want to use trimmed/clipped files instead of raw reads
 
 	
 ## SNP CALLING, FILTERING, & ANALYSIS
 
 ### SNP Calling (Freebayes) 
-- 	step 1: make a contig list for input into freebayes
-- 	`bash fasta2bed.sh assembly.fa outfile`
-- step 2:
+- First, make a contig list (a .bed file) that is required for Freebayes
+`bash fasta2bed.sh assembly.fa outfile`
 
-```
-mkdir vcfout #in same directory as your flash merged samples
-sbatch freebayes-cluster.sh assembly.fa vcfout contiglist ncpu *bam
+- Next, make a new directory to hold your VCF output files
+`mkdir vcfout`
 
-```
-- if not using cluster script, see `freebayes-sequential-intervals.sbatch`
+- Then, call the script
+`sbatch freebayes-cluster.sh assembly.fa vcfout contiglist.bed ncpu *bam`
+- this cluster script generates many files to parallelize the process and then calls the freebayes-sequential-intervals.sbatch on each temp file
+- ncpu is the number of cpus you want to use, you can try 16 for example
 
 ### Filter SNPs (vcflib)
-- 	[vcflib website](https://github.com/vcflib/vcflib#vcflib)
-- 	[vcflib scripts](https://github.com/vcflib/vcflib/tree/master/scripts)
-- 	can filter for: read depth, read mapping quality, base quality, minor allele frequency, min number of reads mapped, etc.
-- 	step 1: 
--  `$ fastVCFcombine.sh <outfile> *.vcf`
-- 	step 2, option 1: filter by genotype (i.e. all individuals must have a quality score of 30 at that SNP)
-- 	`$ sbatch vcf-filter-nomissing-maf05-allgq30.sh #samples <outfile> *.vcf`
--  this is our most strict filter
-- 	step 2, option 2: filter by locus with quality score of 30
-- `$ sbatch vcf-filter-nomissing-maf05-qual30.sh #samples <outfile> *.vcf`
-- this is slightly less strict and may output more SNPs than the script above
-- step 2, option 3: filter for eSNPs
-- `$ sbatch vcf-filter-nomissing-maf05-eSNPs.sh #samples <outfile> *.vcf`
-- this filter uses min number of mapped reads instead of GQ score because we expect eSNP alternates to have different numbers of reads
+- [vcflib website](https://github.com/vcflib/vcflib#vcflib)
+- [vcflib scripts](https://github.com/vcflib/vcflib/tree/master/scripts)
+- can filter for: read depth, read mapping quality, base quality, minor allele frequency, min number of reads mapped, etc.
+
+- First, combine all of your VCF outputs from the parallel processing
+`fastVCFcombine.sh combined.vcf *.vcf`
+
+- Next, use VCF tools to filter your SNPS:
+`sbatch vcftools-snpfilter.sh combined.vcf`
+- this script removes indels, takes only biallelic SNPS, requires 7 mapped reads per allele at each SNP, and sets your min/max allele frequencies
+- you can also allow some missing data with this script using --max-missing (1 means no missing data allowed, 0 means allow all missing data)
+
 
 ### Create 0,1,2 genotype SNP matrix (vcftools)
-- 	`$ bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfile>`
+`bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfile>`
+- this format is used by many downsteams applications, like R
 
-### Format SNP Matrix
-- do this in R
--  easier to do this outside of the cluster
-	-  `rsync user@sherlock.stanford.edu:<files> <path to location on your computer>
-- 	take 3 output files from vcftools and create one file
-
-```
-snps<-read.delim('file.012', header=F)
-pos<-read.delim('file.012.pos',header=F)
-indv<-read.delim<-('file.012.indv',header=F)
-
-colnames(snps)<-paste(pos[,1],pos[,2],sep='-')
-rownames(snps)<-indv[,1]
-snps<-as.matrix(snps)
-
-#PCA of SNPs
-pc.out<-prcomp(snps)
-summary(pc.out)
-plot(pc.out$x[,1],pc.out$x[,2])	#PC1 v PC2
-
-```
-
-### Add Meta data to Matrix 
-- 	make a meta data file with info about individuals (location, date, etc.)
-- 	make sure your meta file is ordered the same as your vcfs! (i.e. ls your samples in the terminal to see their order)
-- script TBD
-
-
-### Test for loci under selection (BayeScan)
-- [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)
-- 	identifies putative loci under selection
-
-## GENE EXPRESSION ANALYSIS 
-
-### Expression counts
-- `bash get-bam-counts.sh *.bam`
-
-
-### WGCNA 
-- in program R
-- [website](https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/)
-- script TBD
-
-
-### Gene expression (DESeq2)
-- use this program in R
-
-```
-library(DESeq2) 
-counts<-read.delim(‘counts.txt,row.names=1) 
-cds<-DESeqDataSetFromMatrix(counts.txt,meta,~cluster) 
-cds<-DESeq(cds) 
-res<-results(cds) 
-sig<-res[which(res$padj<0.05),] 
-write.table(sig,file=‘DEcontigs.txt’,quote=F,sep=‘\t') 
-```
-
-### Samtools
-- [manual](http://www.htslib.org/doc/samtools.html)
-- to view reads mapped to contig of interest
-	- `samtools tview <sample.bam> <assembly.fa>`
-- create a file of one contig
-	-  `samtools view -bh <file.bam> "Contigname" > <outfile.bam>`
--  convert bam to fasta for viewing
-	-  `samtools bam2fq <infile.bam> | seqtk seq -A > <outfile.fa>`
