@@ -1,4 +1,4 @@
-#Transcriptome assembly & analysis in the Palumbi Lab*
+# Transcriptome assembly in the Palumbi Lab*
 
 ## GENERAL INFORMATION
 * Scripts are formatted for Stanford internal use. We use SLURM to send jobs to Stanford's Sherlock cluster.
@@ -344,7 +344,7 @@ gdrive upload --recursive <path>
 	- if you want to use trimmed/clipped files instead of raw reads
 
 	
-## SNP CALLING, FILTERING, & ANALYSIS
+## SNP CALLING & FILTERING
 
 ### SNP Calling (Freebayes) 
 - First, make a contig list (a .bed file) that is required for Freebayes
@@ -375,4 +375,7 @@ gdrive upload --recursive <path>
 ### Create 0,1,2 genotype SNP matrix (vcftools)
 `bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfile>`
 - this format is used by many downsteams applications, like R
+
+## GENE EXPRESSION COUNTS
+`bash get-bam-counts.sh *.bam`
 
