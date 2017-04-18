@@ -377,7 +377,7 @@ gdrive upload --recursive <path>
 
 ### Protein changes
 ```
-	#get open reading frame predictions
+	#get open reading frame predictions for your assembly
 	#usage without blastx info:
 	sbatch get-orf-predictors.sh assembly.fa empytyfile outfile
 	
@@ -388,7 +388,19 @@ gdrive upload --recursive <path>
 	snp_protein_changes.py vcf ref.fa orfpredictor_headers.txt OUT
 	
 ```
-	
+- this will output a file with 
+	- the contig and snp position
+	- the reference allele and alternate allele
+	- the reference and alternate protein
+	- if the protein change was synonymous (S), nonsynonymous (NS), or in a UTR region
+	- the position of the change in the codon (CPOS)
+
+### How to subsample a vcf with a list of SNPs names
+```
+#create a list (goodsnps.txt) of SNP names, for example 'contig/tpos'
+awk -v OFS="\t" '{print $1,$2-1,$2}' goodsnps.txt > goodsnps.bed
+bedtools intersect -b goodsnps.bed -a allsnps.vcf > goodsnps.vcf
+```
 	
 
 ## GENE EXPRESSION COUNTS
