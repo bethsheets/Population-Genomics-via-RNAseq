@@ -375,6 +375,22 @@ gdrive upload --recursive <path>
 `bash vcftools-012genotype-matrix.sh <combined_filtered_file.vcf> <outfile>`
 - this format is used by many downsteams applications, like R
 
+### Protein changes
+```
+	#get open reading frame predictions
+	#usage without blastx info:
+	sbatch get-orf-predictors.sh assembly.fa empytyfile outfile
+	
+	#get ORF headers
+	grep ">" orf.pep | sed 's/>//g' | sed 's/+//g' > orfpredictor_headers.txt
+	
+	#get snp protein changes
+	snp_protein_changes.py vcf ref.fa orfpredictor_headers.txt OUT
+	
+```
+	
+	
+
 ## GENE EXPRESSION COUNTS
 `bash get-bam-counts.sh *.bam`
 
