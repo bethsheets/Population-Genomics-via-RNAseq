@@ -320,6 +320,16 @@ gdrive upload --recursive <path>
 
 ## TRANSCRIPTOME ANALYSIS
 
+### Map reads to assembly with Hisat2
+```
+#create an hisat index
+hisat-2 build infile.fasta basename
+#call the program through a batch script
+bash batch-hisat2-fq-paired.sh hisat2-index chunksize *_1.txt.gz
+
+```
+
+### OLD VERSION, now replace with Hisat2
 ### Map reads to assembly (Bowtie2) 
 - [Bowtie2 download](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
@@ -401,6 +411,15 @@ gdrive upload --recursive <path>
 awk -v OFS="\t" '{print $1,$2-1,$2}' goodsnps.txt > goodsnps.bed
 bedtools intersect -b goodsnps.bed -a allsnps.vcf > goodsnps.vcf
 ```
+
+###Detect SNP outliers (Bayescan)
+- [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)
+- make a .bsc file, see R script `Bayescan_generate_input_file.R`
+- rsync .bsc file to sherlock
+- on Sherlock cluster, run Bayescan 
+`sbatch bayescan.sh input.bsc`
+- can take SNPs from three separate Bayescan runs
+- rsync FST file back to your computer and analyze with R scripts: Bayescan_plot_R.r and Bayescan_plot_results_sample.R
 	
 
 ## GENE EXPRESSION COUNTS
