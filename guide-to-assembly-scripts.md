@@ -87,9 +87,9 @@
 - to see how much memory your job has used so far
 	- ` sstat --format JobID,NTasks,nodelist,MaxRSS,MaxVMSize,AveRSS,AveVMSize $JOBNUMBER`
 
-### Best practices 🌊 :
- 
-🌊 Back up your scratch directory! 
+### Best practices:
+
+Back up your scratch directory! 
 
 - You can use the Sherlock data transfer node to move large datasets onto a backup hard drive
 ```
@@ -105,33 +105,33 @@ gdrive upload --recursive <path>
 ```
 - once you're linked to your google account, there is also an example gdrive-upload.sh script in the shared scripts directory
 
-🌊 Check to see how much space you're taking up in the shared SCRATCH directory
+- Check to see how much space you're taking up in the shared SCRATCH directory
 `du -sh * | sort -h`
 
-🌊 `chmod 775 *` programs, scripts, some files that you create so others can use them
+- `chmod 775 *` programs, scripts, some files that you create so others can use them
 
-🌊 `chmod 444` files you don’t want to accidentally write over, 
+- `chmod 444` files you don’t want to accidentally write over, 
 	`chmod -R ###` for directories
 
-🌊 if downloading a program for the first time, move the executable of the program to the programs folders
+- if downloading a program for the first time, move the executable of the program to the programs folders
  `mv <program> $PI_HOME/programs`
 
-🌊 if downloading a new version of a program, rename with version to not override any executables in that directory
+- if downloading a new version of a program, rename with version to not override any executables in that directory
 
-🌊 try to create scripts that are not hard-coded 
+- try to create scripts that are not hard-coded 
 
-🌊 comment your scripts!
+- comment your scripts!
 
-🌊 Tips for checking outputs along the way:
+- Tips for checking outputs along the way:
 
-- always look at your slurm files for errors
-	- `cat slurm*`
-- when making scripts that split up data into TEMP files for parallel processing, add a line that states your input file in the slurm output
-	- `echo $1` if $1 is your input file
-- to count lines in a file
-	- `wc - l <filename>`
-- to count contigs in a file
-	- `grep -c “>” <filename>`
+	- always look at your slurm files for errors
+		- `cat slurm*`
+	- when making scripts that split up data into TEMP files for parallel processing, add a line that states your input file in the slurm output
+		- `echo $1` if $1 is your input file
+	- to count lines in a file
+		- `wc - l <filename>`
+	- to count contigs in a file
+		- `grep -c “>” <filename>`
 
 
 
@@ -290,34 +290,51 @@ gdrive upload --recursive <path>
 - use the makeblastdb tool from ncbi to make a database (similar to above)
 
 ### 9)Parse XML blast files
-- Both the uniprot and nr batch scripts above output XML formatted results
+- Both the uniprot and nr batch scripts above output XML formatted results to get all data fields available
 - XML files are difficult to work with, pick what information you want and parse to a tab delimited format
 - XML files currently hold the most information about each blast result
 	- i.e. gene name, taxonomy 
-- to parse your files:
+- to parse uniprot results:
 `bash batch-parse-uniprot.sh`
 	- this script calls parse-uniprot-xml.py on your many temp files
+- to parse ncbi-protein results:
+ `bash batch-parse-nr.sh TEMP*.fa.blast.out`
 
-### 10)Filter Assembly 
+### 10)Filter Assembly without available genome
 - If you BLAST to a general database and not to a specific genome, this step is necessary to filter out any contamination
 - remove blasts that are likely environmental contamination, i.e. bacteria, fungi, viruses, alveolata, viridiplantae, haptophyceae, etc.
 
-- first,  merge all of your parsed blast results into one file
-`cat *_parsed.txt > all_parsed.txt`
+- For uniprot results:
+	- first,  merge all of your parsed blast results into one file
+		`cat *_parsed.txt > all_parsed.txt`
 
--  second, create a file of only 'good contigs', i.e. metazoans:
-`bash grep-good-contigs.sh all_parsed.txt assembly.fa`
+	-  second, create a file of only 'good contigs', i.e. metazoans:
+		`bash grep-good-contigs.sh all_parsed.txt assembly.fa`
 
-- third, pull only good contigs from your assembly fasta file
-`sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`
+	- third, if you only want to use uniprot results, pull only good contigs from your assembly fasta file
+	`sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`
 
-- to check how filtering went, count how many contigs you have before and after filtering:
-```
-	grep -c “Contig” goodcontigs.txt
-	grep -c "TRINITY" goodcontigs.txt
-	grep -c “^>” filteredassembly.fa
-```
+	- to check how filtering went, count how many contigs you have before and after filtering:
+		`grep -c “>” filteredassembly.fa`
+- For ncbi-protein results:
+	- first,  merge all of your parsed blast results into one file
+		`cat *_parsed.txt > all_parsed.txt`
+	- second, create a taxonomic tree to use for filtering
+		- make a tab delimited file with contigs names and their associated GI numbers
+			- i.e., import parsed file into excel and keep only those to columns, export as txt file
+		- use this GI list to get taxonomic tree 
+		`sbatch batch-taxonID-from-gi.sh type('n' or 'p') GIlist output`
+	- third, grep good contigs from uniprot
+		`bash grep-good-contigs-ncbiprot.sh uniprot_goodcontigs.txt`
 
+- combine results from uniprot & ncbi-protein databases:
+	`cat uniprot_goodcontigs ncbi_goodcongits > combined_goodcontigs_duplicates.txt`
+	-then take only the uniq contigs from the combined file
+	`cat combined_goodcontigs_duplicates.txt | sort | uniq > combined_goodcontigs_uniq.txt`
+	- you can check the # contigs remaining after this to see how filtering went 
+	- finally, pull only good contigs from your assembly
+	`sbatch batch-filter-assembly.sh assembly.fa combined_goodcontigs_uniq.txt`
+		
 ## TRANSCRIPTOME ANALYSIS
 
 ### Map reads to assembly with Hisat2
@@ -329,7 +346,7 @@ bash batch-hisat2-fq-paired.sh hisat2-index chunksize *_1.txt.gz
 
 ```
 
-### OLD VERSION, now replace with Hisat2
+### OLD VERSION, now replaced with Hisat2
 ### Map reads to assembly (Bowtie2) 
 - [Bowtie2 download](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
@@ -366,6 +383,9 @@ bash batch-hisat2-fq-paired.sh hisat2-index chunksize *_1.txt.gz
 `sbatch freebayes-cluster.sh assembly.fa vcfout contiglist.bed ncpu *bam`
 - this cluster script generates many files to parallelize the process and then calls the freebayes-sequential-intervals.sbatch on each temp file
 - ncpu is the number of cpus you want to use, you can try 16 for example
+
+### SNP Calling version 2 (BCFtools)
+- in progress...
 
 ### Filter SNPs (vcflib)
 - [vcflib website](https://github.com/vcflib/vcflib#vcflib)
