@@ -227,7 +227,16 @@ gdrive upload --recursive <path>
 -  [Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
 -  [blastx commands, table C4](http://www.ncbi.nlm.nih.gov/books/NBK279675/)
 
-### 8a)Annotate with Uniprot database
+### 8a)Downloading a genome of interest to blast against
+- if you don't have this resource; move to 8b
+- download cDNA files for blasting your nucleotides against real transcripts
+- use the makeblastdb tool from ncbi to make a database:
+	`makeblastdb -in <infile.fasta> -dbtype prot -out <outfile>`
+
+
+###Filter Assembly without available genome
+
+### 8b)Annotate with Uniprot database
 - 	Uniprot is a more curated database and is recommended over NCBI-nr
 
 #### How to download & create the Uniprot/Trembl database for the first time:
@@ -259,15 +268,15 @@ gdrive upload --recursive <path>
 	- you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file
 	- `bash batch-blast-uniprot.sh <didnotfinish.fa>` 
 
-### 8b)Annotate with NCBI-nr database
-#### How to download & create the nr database for the first time
+### 8c)Annotate with NCBI-protein database
+#### How to download & create the ncbi-protein database for the first time
 - Make sure local database on sherlock is up to date
 - to open .tar files downloaded from genbank: 
 	- `for i in *.tar ; do tar -xvf $i ; done &`
-	- blast-nr files are already databases, no need to use makedb script
+	- ncbi files are already databases, no need to use makedb script
 
 - To run blast script:
-	- `bash batch-blast-nr.sh`
+	- `bash batch-blast-ncbiprot.sh input.fasta`
 	- this script splits your assembly into TEMP files for parallel processing
 - after running, check if you get an error during your blasts
 	- `cat slurm*` 
@@ -277,17 +286,9 @@ gdrive upload --recursive <path>
   	- for any file with error, take line before (the tempfile)
 	- `cat <TEMPwerror.fa> <TEMPwerror.fa> > <didnotfinish.fa>`
 		- this concatenates all TEMP files that contain an error into a new file
-	- you may want to reduce the # of contigs the batch-blast-uniprot.sh script generates for each TEMP file
-	- `bash batch-blast-uniprot.sh <didnotfinish.fa>`
-		
-### 8c)Reciprocal BLAST 
-`makeblastdb -in file.fasta -dbtype nucl -out file.fasta –parse_seqids`
-- can do this to check overlap between your multiple Trinity alignments 
-	- i.e., does heterozygosity cause issues in your alignments?
+	- you may want to reduce the # of contigs the batch-blast-ncbiprot.sh script generates for each TEMP file
+	- `bash batch-blast-ncbiprot.sh <didnotfinish.fa>`
 
-### 8d)Downloading a genome of interest to blast against
-- download cDNA files for blasting your nucleotides against real transcripts
-- use the makeblastdb tool from ncbi to make a database (similar to above)
 
 ### 9)Parse XML blast files
 - Both the uniprot and nr batch scripts above output XML formatted results to get all data fields available
@@ -300,22 +301,20 @@ gdrive upload --recursive <path>
 - to parse ncbi-protein results:
  `bash batch-parse-nr.sh TEMP*.fa.blast.out`
 
-### 10)Filter Assembly without available genome
+### 10) Use blast results to remove contamination
 - If you BLAST to a general database and not to a specific genome, this step is necessary to filter out any contamination
 - remove blasts that are likely environmental contamination, i.e. bacteria, fungi, viruses, alveolata, viridiplantae, haptophyceae, etc.
 
 - For uniprot results:
 	- first,  merge all of your parsed blast results into one file
 		`cat *_parsed.txt > all_parsed.txt`
-
 	-  second, create a file of only 'good contigs', i.e. metazoans:
 		`bash grep-good-contigs.sh all_parsed.txt assembly.fa`
-
 	- third, if you only want to use uniprot results, pull only good contigs from your assembly fasta file
 	`sbatch batch-filter-assembly.sh assembly.fa goodcontigs.txt`
-
 	- to check how filtering went, count how many contigs you have before and after filtering:
 		`grep -c “>” filteredassembly.fa`
+
 - For ncbi-protein results:
 	- first,  merge all of your parsed blast results into one file
 		`cat *_parsed.txt > all_parsed.txt`
@@ -337,7 +336,10 @@ gdrive upload --recursive <path>
 		
 ## TRANSCRIPTOME ANALYSIS
 
-### Map reads to assembly with Hisat2
+### Map reads to assembly with Hisat2 (current)
+
+- [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)
+
 ```
 #create an hisat index
 hisat-2 build infile.fasta basename
@@ -345,31 +347,22 @@ hisat-2 build infile.fasta basename
 bash batch-hisat2-fq-paired.sh hisat2-index chunksize *_1.txt.gz
 
 ```
+- for single end reads, batch-hisat2-fq-single.sh
 
-### OLD VERSION, now replaced with Hisat2
-### Map reads to assembly (Bowtie2) 
+### Map reads to assembly with Bowtie2 (old version)
 - [Bowtie2 download](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer)
 
-```
-   # first, make a bowtie index from your final assembly, this should output 6 files
-   bowtie2-build <assembly.fa> b2index
-   
-   #next, call the script on your raw (i.e. untrimmed/clipped files)
-   bash batch-bowtie2-fq-paired.sh b2index 1 *_1.txt.gz
-   
-   #check TEMPBATCH.sbatch after submitting to see if it started correctly 
-   cat TEMPBATCH.sbatch
-  
-   #after it completes, check for errors by printing your slurm files to the screen
-   cat slurm*
-```
+- first, make a bowtie index from your final assembly, this should output 6 files
+   `bowtie2-build <assembly.fa> b2index` 
+- next, call the script on your raw (i.e. untrimmed/clipped files)
+   `bash batch-bowtie2-fq-paired.sh b2index 1 *_1.txt.gz`  
+- check TEMPBATCH.sbatch after submitting to see if it started correctly 
+   `cat TEMPBATCH.sbatch` 
+- after it completes, check for errors by printing your slurm files to the screen
+   `cat slurm*`
 
-#### other Bowtie2 script options:
-- there are several other bowtie2 scripts available in the scripts folder, for example:
-	- for single-end reads 
-	- if you want to use trimmed/clipped files instead of raw reads
 
-	
+
 ## SNP CALLING & FILTERING
 
 ### SNP Calling (Freebayes) 
