@@ -51,7 +51,10 @@ plot(pc.out$x[,1],pc.out$x[,2])	#PC1 v PC2
 -
 
 ### Look at ancestry with admixture
-- you will need to make a plink file from your vcf file instead of using your 012 matrix
+- Make a plink file from your VCF
+	`bash plink-from-vcf.sh infile.vcf outfile`
+- Run admixture on the cluster
+
 
 
 
