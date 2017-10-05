@@ -255,8 +255,6 @@ after running:
 	- example scripts: batch-blastn-disco.sh (to split your assembly up for parallel processing), blastn-disco.sh
 	- take only the top hit from your blast output:
 		`awk '!x[$1]++' file.blast.out > tophits.blast.out`
-
-	
 	- for annotation purposes, you could try blasting to the protein genomic resources:
 	- make a protein database:
 		`makeblastdb -in <infile> -dbtype prot -out <outfile>`
@@ -393,7 +391,7 @@ bash batch-hisat2-fq-paired-eas.sh hisat2-index chunksize *_1.txt.gz
 - can filter for: read depth, read mapping quality, base quality, minor allele frequency, min number of reads mapped, etc.
 
 - First, combine all of your VCF outputs from the parallel processing
-`fastVCFcombine.sh combined.vcf *.vcf`
+`fastVCFcombine.sh combined *.vcf`
 
 - Next, use VCF tools to filter your SNPS:
 `sbatch vcftools-snpfilter.sh combined.vcf`
@@ -436,14 +434,14 @@ bedtools intersect -b goodsnps.bed -a allsnps.vcf > goodsnps.vcf
 
 ###Detect SNP outliers (Bayescan)
 - [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)
-- make a .bsc file, see R script `Bayescan_generate_input_file.R`
+- make a .bsc file, see R script: `Bayescan_generate_input_file.R`
 - rsync .bsc file to sherlock
 - on Sherlock cluster, run Bayescan 
-`sbatch bayescan.sh input.bsc`
+	- `sbatch bayescan.sh input.bsc`
 - can take SNPs from three separate Bayescan runs
 - rsync FST file back to your computer and analyze with R scripts: Bayescan_plot_R.r and Bayescan_plot_results_sample.R
 	
 
 ## GENE EXPRESSION COUNTS
 `bash get-bam-counts.sh *.bam`
-
+- see guide-to-R-scripts.md for more analyses
