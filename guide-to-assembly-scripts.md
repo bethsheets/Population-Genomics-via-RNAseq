@@ -297,6 +297,9 @@ after running:
 ### 8c)Annotate with NCBI-protein database
 #### How to download & create the ncbi-protein database for the first time
 - Make sure local database on sherlock is up to date
+	-  link to ncbi databases: ftp://ftp.ncbi.nlm.nih.gov/blast/db/
+	-  nt = nucleotide, nr = protein
+	-  for ex: `wget ftp://ftp.ncbi.nlm.nih.gov/blast/db/nr.*.tar.gz`
 - to open .tar files downloaded from genbank: 
 	- `for i in *.tar ; do tar -xvf $i ; done &`
 	- ncbi files are already databases, no need to use makedb script
