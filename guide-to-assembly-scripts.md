@@ -362,6 +362,54 @@ after running:
 	- you can check the # contigs remaining after this to see how filtering went 
 	- finally, pull only good contigs from your assembly
 	- `sbatch batch-filter-assembly.sh assembly.fa combined_goodcontigs_uniq.txt`
+
+### 10) Assess transcriptome completeness (BUSCO)
+- BUSCO provides quantitative measures for the assessment of genome assembly, gene set, and transcriptome completeness, based on evolutionarily-informed expectations of gene content from near-universal single-copy orthologs 
+
+#Install
+
+-  Edit busco's config.ini file to include paths to necessary dependencies on Sherlock
+
+```
+	cd ~/.config/
+	mkdir busco
+	nano config.ini #copy this file from busco's github directory
+	#update the following paths in the config.ini file:
+	
+[tblastn]
+# path to tblastn
+path = /share/software/user/open/ncbi-blast+/2.7.1/bin
+
+[makeblastdb]
+# path to makeblastdb
+path = /share/software/user/open/ncbi-blast+/2.7.1/bin
+	
+[augustus]
+# path to augustus
+path = /share/software/user/open/augustus/3.3.2/bin/
+
+[etraining]
+# path to augustus etraining
+path = /share/software/user/open/augustus/3.3.2/bin/
+
+# path to augustus perl scripts, redeclare it for each new script
+[gff2gbSmallDNA.pl]
+path = /share/software/user/open/augustus/3.3.2/scripts/
+[new_species.pl]
+path = /share/software/user/open/augustus/3.3.2/scripts/
+[optimize_augustus.pl]
+path = /share/software/user/open/augustus/3.3.2/scripts/
+
+[hmmsearch]
+# path to HMMsearch executable
+path = /home/groups/spalumbi/programs/busco-master/hmmer-3.2.1/src/
+
+```	
+	
+
+#Run
+ - `sbatch busco.sh input.fa output transcriptome`
+	
 		
 ## TRANSCRIPTOME ANALYSIS
 
