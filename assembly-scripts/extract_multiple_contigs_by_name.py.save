@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+''' Script to extract multiple full contigs, based on names specified
+    in input contig_names file
+    usage: ./extract_contig_by_name.py seq_file.fasta contig_names.txt 
+    CYP -- 12/18/2017
+'''
+
+import sys
+import re
+
+''' Use this function if you want several
+    files, each containing only one contig
+'''
+def output_indv_files(names_list):
+  for seq_name in names_list:
+    found = False
+    with open(sys.argv[1], 'r') as f:
+      for line in f: 
+        if re.search(">", line):
+          if found: 
+            out.close()
+            break
+          if re.search(seq_name, line):
+            found = True
+            filename = seq_name+'.fasta'
+            out = open(filename, 'w')
+        if found: out.write(line)
+
+
+''' Use this function if you want a single file
+    containing all of the desired contigs 
+'''
+def output_single_file(names_list):
+  out = open('contigs.fasta', 'w')
+  for seq_name in names_list:
+    found = False
+    with open(sys.argv[1], 'r') as f:
+      for line in f: 
+        if re.search(">", line):
+          if found: 
+            break
+          if re.search(seq_name, line):
+            found = True
+        if found: out.write(line)
+
+
+### MAIN ###
+
+with open(sys.argv[2], 'r') as names:
+  names_list = [x.strip() for x in names.readlines()]
+
+output_single_file(names_list)

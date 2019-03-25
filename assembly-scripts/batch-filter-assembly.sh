@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH -p owners
+#SBATCH -t 24:00:00 
 
 #this will submit the filter-assembly.py to the cluster. These two scripts create a new filtered assembly from your good contigs list.
 

@@ -119,3 +119,4 @@ $opt_threshold
 
 @ARGV = ('-') if @ARGV == 0;
 fac $_ foreach @ARGV;
+

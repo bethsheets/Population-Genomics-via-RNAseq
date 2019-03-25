@@ -6,6 +6,6 @@
 
 for i in ${@}; do
 BASE=$( basename $i .fa.blast.out )
-echo -e "#!/bin/bash\necho $BASE\nparse-uniprot-xml.py ${BASE}_parsed.txt ${i}" > PARSE_${BASE}.sh
+echo -e "#!/bin/bash\necho $BASE\n ml biology py-biopython\n python /scratch/PI/spalumbi/beth/frogs/CAP3/single_sample/blast/blast_results/parse-uniprot-xml.py ${BASE}_parsed.txt ${i}" > PARSE_${BASE}.sh
 sbatch -p owners PARSE_${BASE}.sh
 done

@@ -1,0 +1,1 @@
+EP_COLOR="01;34" egrep -i --color=always "C" | GREP_COLOR="01;32" egrep -i --color=always "A" | GREP_COLOR="01;31" egrep -i --color=always "t" | GREP_COLOR="01;33" egrep -i --color=always "G";}
