@@ -5,36 +5,27 @@
 
 ### How to create a Sherlock account 
 - to get access and support, ask PI to e-mail and give you permission research-computing-support[at]stanford.edu
-- download [Kerberos](https://uit.stanford.edu/service/kerberos)
 - [Sherlock Wiki] (http://sherlock.stanford.edu/mediawiki/index.php/Main_Page)
-- To configure your SSH client to pass those Kerberos credentials for MAC, open terminal (Click Spotlight, type in terminal) and run the following commands:
-```
-	mkdir -p ~/.ssh 
-	echo "Host sherlock sherlock.stanford.edu sherlock* sherlock*.stanford.edu   
-	GSSAPIDelegateCredentials yes   
-	GSSAPIAuthentication yes" >> ~/.ssh/config 
-```
-
-- create project directory in `$PI_SCRATCH/` (1TB space available)
+- create project directory in `$PI_SCRATCH/` (20TB space available)
 	- more space and accessible to other users in the lab 
+	- files are deleted from both your and PI scratch every 6 month. Regular backups (use  "gdrive" or "rclone") are necessary.
 - your personal directory `$HOME` is 15GB
 	- you can also use this space for your research, but it is not easily accessible to other lab members
 - [more info on Sherlock storage](http://sherlock.stanford.edu/mediawiki/index.php/DataStorage)
 
 ### Downloading & storing data from Gnomex
-- go to the directory where you want your raq sequence files
-- `wget http://monalisa.cern.ch/FDT/` 
+- go to the directory where you want your raw sequence files
 - use command line from Gnomex to download files to Sherlock
-- backup raw files on external harddrive in lab
-- can also backup to unlimited space with your Stanford account and google drive
-	- [Sherlock Gdrive tutorial](http://sherlock.stanford.edu/mediawiki/index.php/DataStorage) 
+	- remember to install .jar file in the same directory you want your files to go
+- back up raw files to Palumbi Team Drive 
+	- configure rclone to be set up with the Google Team Drive account: http://moo.nac.uci.edu/~hjm/HOWTO-rclone-to-Gdrive.html
+	- use rclone.sh script in the shared scripts folder
 
 ### Sherlock basics 
 
 - to log in:
 	```
-	kinit user@stanford.edu #& type in pw to gain permission
-	ssh user@sherlock.stanford.edu #to access cluster
+	ssh user@login.stanford.edu #& type in pw to gain permission & access
 	```
 
 - to move around:
@@ -78,7 +69,7 @@
 - to run your job on different nodes, in your batch script, add: 
 	- `#SBATCH -p owners` access to 600 nodes only available to owners. You will be kicked off an owner node if that owner logs on. Always check your slurm file to see if your job was aborted
 	- `#SBATCH -p spalumbi` 256GB memory node
-	- `#SBATCH -p hns` 1TB memory node
+	- `#SBATCH -p hns` a series of nodes just for Humanities & Sciences users
 	- `#SBATCH -p spalumbi,hns` #will submit your job to whatever node is available first
 
 - to check on status of job
@@ -103,16 +94,6 @@ Back up your scratch directory!
 kinit username@stanford.edu
 rsync -avz --progress --stats -e 'ssh -o GSSAPIAuthentication=yes' user@sherlock-dtn.stanford.edu:/<sherlock directory> <backup location>
 ```
-
-- You can also use your Stanford Google Drive (with unlimited storage) to back up your files
-
-
-```
-ml load gdrive
-gdrive -help
-gdrive upload --recursive <path>
-```
-- once you're linked to your google account, there is also an example gdrive-upload.sh script in the shared scripts directory
 
 - Check to see how much space you're taking up in the shared SCRATCH directory
 	- `du -sh * | sort -h`
@@ -223,7 +204,7 @@ gdrive upload --recursive <path>
 - Then combine all Trinitiy assemblies into one file:
 	- `cat Trinityrun1.fa Trinityrun2.fa > all_assemblies.fasta`
 
-### 7)Meta-Assembly (CAP3) 
+### 7) a)Meta-Assembly (CAP3) 
 - [paper](http://genome.cshlp.org/content/9/9/868.full)
 - [manual](http://computing.bio.cam.ac.uk/local/doc/cap3.txt)
 - CAP3 is an overlap consensus assembler that will merge reads that would not assemble in Trinity due to high heterozygosity
@@ -239,6 +220,9 @@ after running:
 
 - to check for contig name duplicates: 
 	- `grep ">" <assembly_file.fa> | perl histogram.pl | head -n`
+
+### 7b) Reduce redundancy in your transcriptome with CDHIT
+ - cdhit.sh
 
 ### 8)Annotate (BLAST) 
 -  [Blastx program download](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
