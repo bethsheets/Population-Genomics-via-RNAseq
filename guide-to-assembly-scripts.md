@@ -468,7 +468,7 @@ bedtools intersect -b goodsnps.bed -a allsnps.vcf > goodsnps.vcf
 
 
 
-###Detect SNP outliers (Bayescan)
+### Detect SNP outliers (Bayescan)
 - [download program](http://cmpg.unibe.ch/software/BayeScan/download.html)
 - make a .bsc file, see R script: `Bayescan_generate_input_file.R`
 - rsync .bsc file to sherlock
