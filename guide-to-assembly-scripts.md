@@ -353,7 +353,6 @@ after running:
 #Install and configure (this has to be done for each individual's Sherlock account)
 
 -  Edit busco's config.ini file to include paths to necessary dependencies on Sherlock
-
 ```
 	cd ~/.config/
 	mkdir busco
@@ -387,12 +386,11 @@ path = /share/software/user/open/augustus/3.3.2/scripts/
 [hmmsearch]
 # path to HMMsearch executable
 path = /home/groups/spalumbi/programs/busco-master/hmmer-3.2.1/src/
-
-```	
+```
 	
 
 #Run
- - `sbatch busco.sh input.fa output transcriptome`
+ - sbatch busco.sh input.fa output transcriptome
 	
 		
 ## TRANSCRIPTOME ANALYSIS
@@ -401,9 +399,8 @@ path = /home/groups/spalumbi/programs/busco-master/hmmer-3.2.1/src/
 
 - [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)
 
-```
 #create an hisat index
-hisat-2 build assembly.fa <output-hisat2-index>
+`hisat-2 build assembly.fa <output-hisat2-index>`
 
 #call the program through a batch script
 `bash batch-hisat2-fq-paired-eas.sh hisat2-index chunksize *_1.txt.gz`
